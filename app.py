@@ -1,8 +1,11 @@
 from flask import Flask
 from flask_socketio import SocketIO
-from cantinaUtils import Database
 from os import path, getcwd
 from json import load
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from Utils.Database.base import Base
 
 from Utils.verify_maintenance import verify_maintenance
 
@@ -40,26 +43,42 @@ app.config['SECRET_KEY'] = config_data['modules'][0]['secret_key']
 socketio = SocketIO(app, cors_allowed_origins="*")  # Lien entre l'application Flaks et le WebSocket
 app.config['UPLOAD_FOLDER'] = path.abspath(path.join(getcwd(), "static/ProfilePicture/"))
 
-database = Database.DataBase(
-    user=config_data['database'][0]['username'],
-    password=config_data['database'][0]['password'],
-    host=config_data['database'][0]['address'],
-    port=config_data['database'][0]['port'],
-    database='cantina_administration'
-)  # Création de l'objet pour se connecter à la base de données via le module cantina
-database.connection()  # Connexion à la base de données
 
-database.exec("""CREATE TABLE IF NOT EXISTS cantina_administration.user(id INT PRIMARY KEY AUTO_INCREMENT, 
+engine_sql = create_engine(
+    f"mysql+pymysql://{config_data['database'][0]['username']}:{config_data['database'][0]['password']}@{config_data['database'][0]['address']}:{config_data['database'][0]['port']}/{config_data['database'][0]['name']}",
+    pool_size=10,        # Max 10 connexions en parallèle
+    max_overflow=20,     # 20 connexions supplémentaires si besoin
+    pool_timeout=30,     # Temps max d’attente pour une connexion libre
+    pool_recycle=1800,    # Ferme et recrée une connexion après 30 min
+    isolation_level="AUTOCOMMIT"
+)
+
+Base.metadata.create_all(engine_sql)
+
+Session = sessionmaker(bind=engine_sql)
+database = Session()
+
+
+"""database = Database.DataBase(
+    user=,
+    password=,
+    host=,
+    port=,
+    database=''
+)  # Création de l'objet pour se connecter à la base de données via le module cantina
+database.connection()  # Connexion à la base de données"""
+
+'''database.execute("""CREATE TABLE IF NOT EXISTS cantina_administration.user(id INT PRIMARY KEY AUTO_INCREMENT, 
 token TEXT NOT NULL,  username TEXT NOT NULL, password TEXT NOT NULL, email TEXT NOT NULL, 
 email_verified BOOL DEFAULT FALSE, email_verification_code TEXT, picture BOOL DEFAULT false, 
 A2F BOOL DEFAULT FALSE, A2F_secret TEXT, last_connection DATE, 
-desactivated BOOL DEFAULT FALSE, theme TEXT DEFAULT 'light')""", None)
-database.exec("""CREATE TABLE IF NOT EXISTS cantina_administration.config(id INT PRIMARY KEY AUTO_INCREMENT, 
+desactivated BOOL DEFAULT FALSE, theme TEXT DEFAULT 'light')""")
+database.execute("""CREATE TABLE IF NOT EXISTS cantina_administration.config(id INT PRIMARY KEY AUTO_INCREMENT, 
 name TEXT, content TEXT)""", None)
-database.exec("""CREATE TABLE IF NOT EXISTS cantina_administration.modules(id INT PRIMARY KEY AUTO_INCREMENT, 
+database.execute("""CREATE TABLE IF NOT EXISTS cantina_administration.modules(id INT PRIMARY KEY AUTO_INCREMENT, 
 token TEXT, name TEXT, fqdn TEXT, maintenance BOOL default FALSE, status INTEGER DEFAULT 0, 
 socket_url TEXT DEFAULT '/socket/', last_heartbeat INT default 0)""", None)
-database.exec("""CREATE TABLE IF NOT EXISTS cantina_administration.permission(id INT PRIMARY KEY AUTO_INCREMENT,
+database.execute("""CREATE TABLE IF NOT EXISTS cantina_administration.permission(id INT PRIMARY KEY AUTO_INCREMENT,
 user_token TEXT NOT NULL, show_log BOOL DEFAULT FALSE, edit_username BOOL DEFAULT FALSE, edit_email BOOL DEFAULT FALSE, 
 edit_password BOOL DEFAULT FALSE, edit_profile_picture BOOL DEFAULT FALSE, edit_A2F BOOL DEFAULT FALSE, 
 edit_ergo BOOL DEFAULT FALSE, show_specific_account BOOL DEFAULT FALSE, edit_username_admin BOOL DEFAULT FALSE,
@@ -71,8 +90,8 @@ delete_account BOOL DEFAULT FALSE, desactivate_account BOOL DEFAULT FALSE, edit_
 show_all_modules BOOL DEFAULT FALSE, on_off_modules BOOL DEFAULT FALSE, on_off_maintenance BOOL DEFAULT FALSE, 
 delete_modules BOOL DEFAULT FALSE, add_modules BOOL DEFAULT FALSE, edit_name_module BOOL DEFAULT FALSE, 
 edit_url_module BOOL DEFAULT FALSE, edit_socket_url BOOL DEFAULT FALSE, edit_smtp_config BOOL DEFAULT FALSE, admin BOOL DEFAULT FALSE)""", None)
-database.exec("""CREATE TABLE IF NOT EXISTS cantina_administration.log(id INT PRIMARY KEY AUTO_INCREMENT, 
-    action_name TEXT, user_ip TEXT, user_token TEXT, details TEXT, log_level INT)""", None)
+database.execute("""CREATE TABLE IF NOT EXISTS cantina_administration.log(id INT PRIMARY KEY AUTO_INCREMENT, 
+    action_name TEXT, user_ip TEXT, user_token TEXT, details TEXT, log_level INT)""", None)'''
 
 # Vérifiacation du mode de maintenance
 @app.before_request
