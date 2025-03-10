@@ -7,7 +7,7 @@ def verify_maintenance(database, maintenance):
         if not verify_login(database):
             return redirect(url_for('sso_login', error='0'))
         else:
-            user_permission = database.database.query(Permission).filter(Permission.user_token == request.cookies.get('token')).first()
+            user_permission = database.query(Permission).filter(Permission.user_token == request.cookies.get('token')).first()
             if maintenance and not user_permission[0]:
                 return render_template("User/maintenance.html")
             elif maintenance and user_permission[0]:
