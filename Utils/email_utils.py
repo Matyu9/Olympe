@@ -4,41 +4,36 @@ from email.mime.multipart import MIMEMultipart
 from flask import request
 from random import randint
 
+from Utils.Database.config import Config
+from Utils.Database.user import User
+
 
 def send_verification_email(database):
     try:
-        conn_url = database.select('''SELECT content FROM cantina_administration.config WHERE name='SMTP_URL' ''', None,
-                                   number_of_data=1)[0]
-        conn_port = database.select('''SELECT content FROM cantina_administration.config WHERE name='SMTP_PORT' ''',
-                                    None, number_of_data=1)[0]
-        conn_email = database.select('''SELECT content FROM cantina_administration.config WHERE name='SMTP_EMAIL' ''',
-                                     None, number_of_data=1)[0]
-        conn_passwd = database.select('''SELECT content FROM cantina_administration.config 
-        WHERE name='SMTP_PASSWORD' ''', None, number_of_data=1)[0]
+        conn_url = database.query(Config.content).filter(Config.name == "SMTP_URL").first()[0]
+        conn_port = database.query(Config.content).filter(Config.name == "SMTP_PORT").first()[0]
+        conn_email = database.query(Config.content).filter(Config.name == "SMTP_EMAIL").first()[0]
+        conn_passwd = database.query(Config.content).filter(Config.name == "SMTP_PASSWORD").first()[0]
 
-        subject = database.select('''SELECT content FROM cantina_administration.config WHERE 
-        name='MAIL_VERIFICATION_SUJET' ''', None, number_of_data=1)[0]
-        message = database.select('''SELECT content FROM cantina_administration.config WHERE 
-        name='MAIL_VERIFICATION_CONTENU' ''', None, number_of_data=1)[0]
-        destinataire = database.select('''SELECT email, email_verified FROM cantina_administration.user 
-        WHERE token = %s''', (request.cookies.get('token')), number_of_data=1)
+        subject = database.query(Config.content).filter(Config.name == "MAIL_VERIFICATION_SUJET").first()[0]
+        message = database.query(Config.content).filter(Config.name == "MAIL_VERIFICATION_CONTENU").first()[0]
 
-        db_code = database.select('''SELECT email_verification_code FROM cantina_administration.user WHERE token = %s''',
-                                  (request.cookies.get('token')), number_of_data=1)
+        destinataire = database.query(User).filter(User.token == request.cookies.get('token')).first()
 
     except TypeError:
         return 'error1: Configuration incomplète ou inexistante'
 
-    if destinataire[1]:
+    if destinataire.email_verified:
         return 'already_check'
 
-    if db_code is None or db_code[0] == 'reset':
+    if destinataire.email_verification_code is None or destinataire.email_verification_code == 'reset':
         code = get_rand_num_for_email_verif()
-        database.exec("""UPDATE cantina_administration.user SET email_verification_code = %s WHERE token = %s""",
-                      (code, request.cookies.get('token')))
+        database.query(User).filter(User.token == request.cookies.get("token")).update(
+            {"email_verification_code": code}
+        )
+        database.commit()
     else:
-        code = database.select('''SELECT email_verification_code FROM cantina_administration.user WHERE token = %s''',
-                               (request.cookies.get('token')), number_of_data=1)[0]
+        code = destinataire.email_verification_code
 
     if conn_url is None or conn_port is None or conn_email is None:
         return 'error1: Configuration incomplète ou inexistante.'
@@ -48,7 +43,7 @@ def send_verification_email(database):
 
     mail = MIMEMultipart()
     mail['From'] = conn_email
-    mail['To'] = destinataire[0]
+    mail['To'] = destinataire.email
     mail['Subject'] = subject
     try:
         content = MIMEText(message.format(code).encode('utf-8'), 'plain', 'utf-8')
@@ -58,7 +53,7 @@ def send_verification_email(database):
         smtp_server.ehlo()
         smtp_server.login(conn_email, conn_passwd)
 
-        smtp_server.sendmail(conn_email, destinataire[0], mail.as_string())
+        smtp_server.sendmail(conn_email, destinataire.email, mail.as_string())
         smtp_server.close()
 
         return 'success'

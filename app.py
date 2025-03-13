@@ -88,12 +88,12 @@ def user_space():
 
 @app.route('/2FA/add/', methods=['GET', 'POST'])
 def double2FA_add():
-    return doubleFA_add_cogs(get_db(Session))
+    return doubleFA_add_cogs(get_db(Session)) ###
 
 
 @app.route('/email/verif/', methods=['GET', 'POST'])
 def email_verif():
-    return email_verif_cogs(database)
+    return email_verif_cogs(get_db(Session))
 
 
 """
