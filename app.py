@@ -73,22 +73,22 @@ def close_db(error=None):
 
 @app.route('/', methods=['GET'])
 def home():
-    return user_home_cogs(get_db(Session))
+    return user_home_cogs(get_db(Session)) ###
 
 
 @app.route('/user_space/get_profile_picture')
 def get_profile_picture():
-    return get_profile_picture_cogs(app.config['UPLOAD_FOLDER'])
+    return get_profile_picture_cogs(app.config['UPLOAD_FOLDER']) ###
 
 
 @app.route('/user_space/', methods=['GET', 'POST'])
 def user_space():
-    return user_space_cogs(get_db(Session), app.config['UPLOAD_FOLDER'])
+    return user_space_cogs(get_db(Session), app.config['UPLOAD_FOLDER']) ###
 
 
 @app.route('/2FA/add/', methods=['GET', 'POST'])
 def double2FA_add():
-    return doubleFA_add_cogs(database)
+    return doubleFA_add_cogs(get_db(Session))
 
 
 @app.route('/email/verif/', methods=['GET', 'POST'])

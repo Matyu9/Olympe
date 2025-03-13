@@ -20,11 +20,10 @@ def verify_login(database):
     return True if token_validation is not None and validation == validation_from_db[0] else False
 
 
-def verify_A2F(database):
+def verify_A2F(A2F_secret):
     try:
-        key = totp.TOTP(database.select('''SELECT A2F_secret FROM cantina_administration.user WHERE username=%s''',
-                                        (request.form['username']), number_of_data=1)[0])
+        key = totp.TOTP(A2F_secret)
     except BadRequestKeyError:
-        key = totp.TOTP(database.select('''SELECT A2F_secret FROM cantina_administration.user WHERE token=%s''',
-                                        (request.cookies.get('token')), number_of_data=1)[0])
+        key = totp.TOTP(A2F_secret)
+
     return key.verify(request.form['a2f-code'].replace(" ", ""))
