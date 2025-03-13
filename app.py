@@ -55,42 +55,8 @@ engine_sql = create_engine(
 Base.metadata.create_all(engine_sql)
 
 Session = sessionmaker(bind=engine_sql)
-
 database = ""
 
-"""database = Database.DataBase(
-    user=,
-    password=,
-    host=,
-    port=,
-    database=''
-)  # Création de l'objet pour se connecter à la base de données via le module cantina
-database.connection()  # Connexion à la base de données"""
-
-'''database.execute("""CREATE TABLE IF NOT EXISTS cantina_administration.user(id INT PRIMARY KEY AUTO_INCREMENT, 
-token TEXT NOT NULL,  username TEXT NOT NULL, password TEXT NOT NULL, email TEXT NOT NULL, 
-email_verified BOOL DEFAULT FALSE, email_verification_code TEXT, picture BOOL DEFAULT false, 
-A2F BOOL DEFAULT FALSE, A2F_secret TEXT, last_connection DATE, 
-desactivated BOOL DEFAULT FALSE, theme TEXT DEFAULT 'light')""")
-database.execute("""CREATE TABLE IF NOT EXISTS cantina_administration.config(id INT PRIMARY KEY AUTO_INCREMENT, 
-name TEXT, content TEXT)""", None)
-database.execute("""CREATE TABLE IF NOT EXISTS cantina_administration.modules(id INT PRIMARY KEY AUTO_INCREMENT, 
-token TEXT, name TEXT, fqdn TEXT, maintenance BOOL default FALSE, status INTEGER DEFAULT 0, 
-socket_url TEXT DEFAULT '/socket/', last_heartbeat INT default 0)""", None)
-database.execute("""CREATE TABLE IF NOT EXISTS cantina_administration.permission(id INT PRIMARY KEY AUTO_INCREMENT,
-user_token TEXT NOT NULL, show_log BOOL DEFAULT FALSE, edit_username BOOL DEFAULT FALSE, edit_email BOOL DEFAULT FALSE, 
-edit_password BOOL DEFAULT FALSE, edit_profile_picture BOOL DEFAULT FALSE, edit_A2F BOOL DEFAULT FALSE, 
-edit_ergo BOOL DEFAULT FALSE, show_specific_account BOOL DEFAULT FALSE, edit_username_admin BOOL DEFAULT FALSE,
-edit_email_admin BOOL DEFAULT FALSE, edit_password_admin BOOL DEFAULT FALSE, 
-edit_profile_picture_admin BOOl DEFAULT FALSE, allow_edit_username BOOL DEFAULT FALSE, 
-allow_edit_email BOOL DEFAULT FALSE, allow_edit_password BOOL DEFAULT FALSE,
-allow_edit_profile_picture BOOL DEFAULT FALSE, allow_edit_A2F BOOL DEFAULT FALSE, create_user BOOL DEFAULT FALSE, 
-delete_account BOOL DEFAULT FALSE, desactivate_account BOOL DEFAULT FALSE, edit_permission BOOL DEFAULT FALSE, 
-show_all_modules BOOL DEFAULT FALSE, on_off_modules BOOL DEFAULT FALSE, on_off_maintenance BOOL DEFAULT FALSE, 
-delete_modules BOOL DEFAULT FALSE, add_modules BOOL DEFAULT FALSE, edit_name_module BOOL DEFAULT FALSE, 
-edit_url_module BOOL DEFAULT FALSE, edit_socket_url BOOL DEFAULT FALSE, edit_smtp_config BOOL DEFAULT FALSE, admin BOOL DEFAULT FALSE)""", None)
-database.execute("""CREATE TABLE IF NOT EXISTS cantina_administration.log(id INT PRIMARY KEY AUTO_INCREMENT, 
-    action_name TEXT, user_ip TEXT, user_token TEXT, details TEXT, log_level INT)""", None)'''
 
 # Vérifiacation du mode de maintenance
 @app.before_request
@@ -117,7 +83,7 @@ def get_profile_picture():
 
 @app.route('/user_space/', methods=['GET', 'POST'])
 def user_space():
-    return user_space_cogs(database, app.config['UPLOAD_FOLDER'])
+    return user_space_cogs(get_db(Session), app.config['UPLOAD_FOLDER'])
 
 
 @app.route('/2FA/add/', methods=['GET', 'POST'])
@@ -198,11 +164,11 @@ def smtp_test():
 
 @app.route('/sso/login/', methods=['GET', 'POST'])
 def sso_login(error=0):
-    return sso_login_cogs(database, error, config_data['modules'][0]['global_domain'])
+    return sso_login_cogs(get_db(Session), error, config_data['modules'][0]['global_domain'])
 
 @app.route('/sso/login/api', methods=['POST'])
 def api_sso_login(error=0):
-    return api_login_cogs(database, error)
+    return api_login_cogs(get_db(Session), error)
 
 @app.route('/sso/logout/', methods=['GET'])
 def sso_logout():

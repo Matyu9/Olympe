@@ -33,9 +33,9 @@
                 </a>
             </li>
         </ul>
-        {% if user_permission[9] or user_permission[14] or user_permission[15] or user_permission[16] or user_permission[17] or user_permission[18] or user_permission[23] or user_permission[31] or user_permission[32]%}
+        {% if user_permission.show_specific_account or user_permission.edit_username_admin or user_permission.edit_email_admin or user_permission.edit_password_admin or user_permission.edit_profile_picture_admin or user_permission.create_user or user_permission.delete_account or user_permission.desactivate_account or user_permission.edit_permission or user_permission.admin or user_permission.allow_edit_username or user_permission.allow_edit_email  or user_permission.allow_edit_password  or user_permission.allow_edit_profile_picture or user_permission.allow_edit_A2F or user_permission.show_all_modules or user_permission.on_off_modules  or user_permission.on_off_maintenance or user_permission.delete_modules  or user_permission.add_modules or user_permission.edit_name_module or user_permission.edit_url_module or user_permission.edit_socket_url  or user_permission.edit_smtp_config %}
             <ul class="menu pt-5 mt-5 space-y-2 border-primary border-t">
-                {% if user_permission[9] or user_permission[32] %}
+                {% if user_permission.show_specific_account or user_permission.edit_username_admin or user_permission.edit_email_admin or user_permission.edit_password_admin or user_permission.edit_profile_picture_admin or user_permission.create_user or user_permission.delete_account or user_permission.desactivate_account or user_permission.edit_permission or user_permission.admin %}
                     <li>
                         <a href="{{ url_for('show_user') }}" class="flex items-center p-2 {% if request.path == url_for('show_user') %}active{% endif %}">
                             <svg aria-hidden="true" class="w-6 h-6 transition duration-75" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -48,7 +48,7 @@
                         </a>
                     </li>
                 {% endif %}
-                {% if user_permission[14] or user_permission[15] or user_permission[16] or user_permission[17] or user_permission[18] or user_permission[32] %}
+                {% if user_permission.allow_edit_username or user_permission.allow_edit_email  or user_permission.allow_edit_password  or user_permission.allow_edit_profile_picture or user_permission.allow_edit_A2F or user_permission.admin %}
                     <li>
                         <a href="{{ url_for('global_permission') }}" class="flex items-center p-2 {% if request.path == url_for('global_permission') %}active{% endif %}">
                             <svg aria-hidden="true" class="w-6 h-6 transition duration-75" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -61,7 +61,7 @@
                         </a>
                     </li>
                 {% endif %}
-                {% if user_permission[23] or user_permission[32] %}
+                {% if user_permission.show_all_modules or user_permission.on_off_modules  or user_permission.on_off_maintenance or user_permission.delete_modules  or user_permission.add_modules or user_permission.edit_name_module or user_permission.edit_url_module or user_permission.edit_socket_url or user_permission.admin %}
                     <li>
                         <a href="{{ url_for('show_modules') }}" class="flex items-center p-2 {% if request.path == url_for('show_modules') %}active{% endif %}">
                             <svg aria-hidden="true" class="w-6 h-6 transition duration-75" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -74,7 +74,7 @@
                         </a>
                    </li>
                 {% endif %}
-                {% if user_permission[31] or user_permission[32] %}
+                {% if user_permission.edit_smtp_config or user_permission.admin %}
                     <li>
                         <a href="{{ url_for('smtp_config') }}" class="flex items-center p-2 {% if request.path == url_for('smtp_config') %}active{% endif %}">
                             <svg aria-hidden="true" class="w-6 h-6 transition duration-75" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -95,14 +95,14 @@
         <ul class="menu pt-5 mt-5 space-y-2 border-primary border-t">
             {% for element in modules_info %}
                 <li>
-                    <a href="{{ element[3] }}" target="_blank" class="flex items-center p-2 ">
+                    <a href="{{ element.fqdn }}" target="_blank" class="flex items-center p-2 ">
                         <svg aria-hidden="true" class="w-6 h-6 transition duration-75" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                             <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"></path>
                             <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"></path>
                             <path d="M16 5l3 3"></path>
                         </svg>
-                        <span class="ml-3">{{ element[2] }}</span>
+                        <span class="ml-3">{{ element.name }}</span>
                     </a>
                 </li>
             {% endfor %}

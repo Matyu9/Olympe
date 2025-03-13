@@ -21,7 +21,7 @@ def user_home_cogs(database):
     if request.method == 'GET':
         # Récupération des permissions de l'utilisateur
         user_permission = database.query(Permission).filter(Permission.user_token == request.cookies.get('token')).first()
-        modules_info = database.query(Module)
+        modules_info = database.query(Module).all()
         nb_user = database.query(func.count(User.id)).scalar()
         nb_module = database.query(func.count(Module.id)).scalar()
 

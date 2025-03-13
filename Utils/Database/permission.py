@@ -15,7 +15,7 @@ class Permission(Base):
     edit_password = Column(Boolean, default=False)
     edit_profile_picture = Column(Boolean, default=False)
     edit_A2F = Column(Boolean, default=False)
-    edit_ergo = Column(Boolean, default=False)
+    edit_theme = Column(Boolean, default=False)
 
     # User administration permissions
     show_specific_account = Column(Boolean, default=False)
