@@ -93,7 +93,7 @@ def double2FA_add():
 
 @app.route('/email/verif/', methods=['GET', 'POST'])
 def email_verif():
-    return email_verif_cogs(get_db(Session))
+    return email_verif_cogs(get_db(Session)) ###
 
 
 """
@@ -103,7 +103,7 @@ def email_verif():
 
 @app.route('/admin/user/', methods=['GET', 'POST'])
 def show_user():
-    return show_user_cogs(database, app.config['UPLOAD_FOLDER'])
+    return show_user_cogs(get_db(Session), app.config['UPLOAD_FOLDER']) ###
 
 
 @app.route('/admin/user/add/', methods=['GET', 'POST'])
