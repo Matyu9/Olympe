@@ -108,7 +108,7 @@ def show_user():
 
 @app.route('/admin/user/add/', methods=['GET', 'POST'])
 def add_user():
-    return add_user_cogs(database)
+    return add_user_cogs(get_db(Session)) ###
 
 
 @app.route('/admin/user/edit_permission/', methods=['POST'])
