@@ -50,5 +50,4 @@ class Permission(Base):
     # Configuration
     edit_smtp_config = Column(Boolean, default=False)
 
-    # Super admin
     admin = Column(Boolean, default=False)

@@ -113,7 +113,7 @@ def add_user():
 
 @app.route('/admin/user/edit_permission/', methods=['POST'])
 def edit_permission_user():
-    return edit_user_permission_cogs(database)
+    return edit_user_permission_cogs(get_db(Session))
 
 
 @app.route('/admin/user/desactivate/', methods=['POST'])

@@ -221,7 +221,7 @@
                         ('edit_password', 'Modifier son mot de passe'),
                         ('edit_profile_picture', 'Modifier sa photo de profil'),
                         ('edit_A2F', 'Modifier sa 2FA'),
-                        ('edit_ergo', 'Modifier son thème')
+                        ('edit_theme', 'Modifier son thème')
                     ]),
                     ('Administration Utilisateurs', [
                         ('admin', 'Droits administrateur'),
@@ -241,6 +241,7 @@
                         ('create_user', 'Créer un utilisateur'),
                         ('delete_account', 'Supprimer un utilisateur'),
                         ('desactivate_account', 'Désactiver un utilisateur'),
+                        ('edit_permission', 'Modifier les permissions d\'un utilisateur'),
                     ]),
                     ('Modules et Maintenance', [
                         ('show_log', 'Voir les logs'),
@@ -248,17 +249,17 @@
                         ('on_off_modules', 'Activer/Désactiver modules'),
                         ('on_off_maintenance', 'Mode maintenance'),
                         ('delete_modules', 'Supprimer un module'),
-                        ('add_modules', 'Ajouter un module')
+                        ('add_modules', 'Ajouter un module'),
+                        ('edit_name_module', 'Modifier le nom d\'un module'),
+                        ('edit_url_module', 'Modifier l\'URL d\'un module'),
+                        ('edit_socket_url', 'Modifier l\'URL du socket d\'un module')
                     ]),
                     ('Configuration Système', [
-                        ('edit_name_module', 'Modifier nom du module'),
-                        ('edit_url_module', 'Modifier URL du module'),
-                        ('edit_socket_url', 'Modifier URL socket'),
                         ('edit_smtp_config', 'Modifier config SMTP')
                     ])
                 ] %}
 
-                <input type="hidden" id="userToken" value="{{ selected_user_info.token }}">
+                <input type="hidden" id="token" value="{{ selected_user_info.token }}">
                 {% for category, perms in permissions %}
                     <div class="card bg-base-200 shadow-xl">
                         <div class="card-body p-4">
@@ -327,7 +328,7 @@
 
 <script>
 function updatePermission(permissionName, value) {
-    const userToken = document.getElementById('userToken').value;
+    const userToken = document.getElementById('token').value;
 
     fetch('{{ url_for('edit_permission_user') }}', {
         method: 'POST',
