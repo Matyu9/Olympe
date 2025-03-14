@@ -128,7 +128,7 @@ def delete_user():
 
 @app.route('/admin/permission/global/', methods=['POST', 'GET'])
 def global_permission():
-    return global_permission_cogs(database)
+    return global_permission_cogs(get_db(Session))
 
 
 @app.route('/admin/modules/', methods=['POST', 'GET'])

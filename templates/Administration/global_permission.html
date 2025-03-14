@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns="http://www.w3.org/1999/html" data-theme="{{ local_user_theme[0] }}">
+<html lang="fr" xmlns="http://www.w3.org/1999/html" data-theme="{{ user_data.theme }}">
 <head>
     <meta charset="UTF-8">
     <title>Cantina - Olympe</title>
@@ -43,7 +43,7 @@
                 <form method="post">
                     <input type="hidden" name="token" value="{{ permission[1] }}">
 
-                    {% if user_permission[14] or user_permission[32]%}
+                    {% if user_permission.allow_edit_username or user_permission.admin%}
                         <div class="bg-base-200 p-4 rounded-lg">
                             <div class="text-sm opacity-70 mb-1">Modification des noms d'utilisateurs : </div>
                             <div class="font-semibold">
@@ -59,7 +59,7 @@
                         </div>
                     {% endif %}
 
-                    {% if user_permission[15] or user_permission[32] %}
+                    {% if user_permission.allow_edit_password or user_permission.admin %}
                         <div class="bg-base-200 p-4 rounded-lg">
                             <div class="text-sm opacity-70 mb-1">Modification des mots de passes :</div>
                             <div class="font-semibold">
@@ -75,7 +75,7 @@
                         </div>
                     {% endif %}
 
-                    {% if user_permission[16] or user_permission[32] %}
+                    {% if user_permission.allow_edit_email or user_permission.admin %}
                         <div class="bg-base-200 p-4 rounded-lg">
                             <div class="text-sm opacity-70 mb-1">Modification des addresses emails :</div>
                             <div class="font-semibold">
@@ -91,7 +91,7 @@
                         </div>
                     {% endif %}
 
-                    {% if user_permission[17] or user_permission[32] %}
+                    {% if user_permission.allow_edit_profile_picture or user_permission.admin %}
                         <div class="bg-base-200 p-4 rounded-lg">
                             <div class="text-sm opacity-70 mb-1">Modification des photos de profile :</div>
                             <div class="font-semibold">
@@ -107,23 +107,23 @@
                         </div>
                     {% endif %}
 
-                    {% if user_permission[18] or user_permission[32] %}
+                    {% if user_permission.allow_edit_A2F or user_permission.admin %}
                         <div class="bg-base-200 p-4 rounded-lg">
-                            <div class="text-sm opacity-70 mb-1">Modification des authentification à deux facteurs :</div>
+                            <div class="text-sm opacity-70 mb-1">Modification des authentifications à deux facteurs :</div>
                             <div class="font-semibold">
                                 <label>
-                                    <input type="checkbox" class="toggle" name="edit_a2f" {% if permission[4] == '1' %}checked{% endif %}><br>
+                                    <input type="checkbox" class="toggle" name="edit_A2F" {% if permission[4] == '1' %}checked{% endif %}><br>
                                 </label>
                             </div>
                         </div>
                     {% else %}
                         <div class="bg-base-200 p-4 rounded-lg">
-                            <div class="text-sm opacity-70 mb-1">Modification des authentification à deux facteurs :</div>
+                            <div class="text-sm opacity-70 mb-1">Modification des authentifications à deux facteurs :</div>
                             <div class="font-semibold">{% if permission[4] == "1" %}Oui{% else %}Non{% endif %}</div>
                         </div>
                     {% endif %}
 
-                    {% if user_permission[14] or user_permission[15] or user_permission[16] or user_permission[17] or user_permission[18] or user_permission[32]%}
+                    {% if user_permission.allow_edit_username or user_permission.allow_edit_email or user_permission.allow_edit_password or user_permission.allow_edit_profile_picture or user_permission.allow_edit_A2F or user_permission.admin %}
                         <div class="card-actions justify-end">
                             <button class="btn btn-primary" onclick="showGlobalPermissionForm()">Modifier les modifications du comptes</button>
                         </div>
