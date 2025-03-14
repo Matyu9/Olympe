@@ -12,9 +12,6 @@ def edit_user_permission_cogs(database):
         if not user_permission.edit_permission and not user_permission.admin:
             return redirect(url_for('show_user'))
 
-        print({
-                request.json['permission_name']: request.json['value'],
-            })
 
         database.query(Permission).filter(Permission.user_token == request.json["token"]).update(
             {

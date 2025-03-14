@@ -113,17 +113,17 @@ def add_user():
 
 @app.route('/admin/user/edit_permission/', methods=['POST'])
 def edit_permission_user():
-    return edit_user_permission_cogs(get_db(Session))
+    return edit_user_permission_cogs(get_db(Session)) ###
 
 
 @app.route('/admin/user/desactivate/', methods=['POST'])
 def desactivate_user():
-    return desactivate_user_cogs(database)
+    return desactivate_user_cogs(get_db(Session)) ###
 
 
 @app.route('/admin/user/delete/', methods=['POST'])
 def delete_user():
-    return delete_user_cogs(database)
+    return delete_user_cogs(get_db(Session)) ###
 
 
 @app.route('/admin/permission/global/', methods=['POST', 'GET'])

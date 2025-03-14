@@ -26,7 +26,7 @@
                 {% if user_permission.delete_account or user_permission.admin %}
                     <div class="w-full">
                         <form action="{{ url_for('delete_user') }}" method="post" id="delete_account" class="w-full">
-                            <input type='hidden' name='token_to_delete' value="{{ selected_user_info[1] }}"/>
+                            <input type='hidden' name='token_to_delete' value="{{ selected_user_info.token }}"/>
                             <button type="button" class="btn btn-warning w-full" onclick="delete_account()">
                                 Supprimer le compte
                             </button>
@@ -38,7 +38,7 @@
                 {% if user_permission.desactivate_account or user_permission.admin and selected_user_info.token != request.cookies.get('token') %}
                     <div class="w-full">
                         <form action="{{ url_for('desactivate_user') }}" method="post" id="desactivate_account" class="w-full">
-                            <input type='hidden' name='token_to_desactivate' value="{{ selected_user_info[1] }}"/>
+                            <input type='hidden' name='token_to_desactivate' value="{{ selected_user_info.token }}"/>
                             {% if not selected_user_info.desactivated or selected_user_info.desactivated == 0 %}
                                 <button type="button" class="btn btn-warning w-full" onclick="desactivate_account(1)">
                                     Désactiver le compte
