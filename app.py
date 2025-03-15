@@ -138,7 +138,7 @@ def show_modules():
 
 @app.route('/admin/modules/add/', methods=['POST', 'GET'])
 def add_modules():
-    return add_modules_cogs(database)
+    return add_modules_cogs(get_db(Session))
 
 
 @app.route('/admin/modules/maintenance/', methods=['POST'])
