@@ -128,12 +128,12 @@ def delete_user():
 
 @app.route('/admin/permission/global/', methods=['POST', 'GET'])
 def global_permission():
-    return global_permission_cogs(get_db(Session))
+    return global_permission_cogs(get_db(Session)) ###
 
 
 @app.route('/admin/modules/', methods=['POST', 'GET'])
 def show_modules():
-    return show_modules_cogs(database)
+    return show_modules_cogs(get_db(Session)) ###
 
 
 @app.route('/admin/modules/add/', methods=['POST', 'GET'])
@@ -144,7 +144,7 @@ def add_modules():
 @app.route('/admin/modules/maintenance/', methods=['POST'])
 def maintenance():
     from Cogs.Administration.Modules.maintenance import maintenance_cogs
-    return maintenance_cogs(database)
+    return maintenance_cogs(get_db(Session))
 
 
 @app.route('/admin/smtp/config/', methods=['POST', 'GET'])

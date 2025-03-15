@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="{{ local_user_theme[0] }}">
+<html lang="fr" data-theme="{{ user_data.theme }}">
 <head>
     <meta charset="UTF-8">
     <title>Cantina - Olympe</title>
@@ -14,7 +14,7 @@
     {% include "PlaceHolder/sidebar.html" %}
     <main class="p-4 md:ml-64 h-auto pt-20 min-h-screen">
         <div id="button-bar" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {% if user_permission[27] %}
+            {% if user_permission.add_modules %}
                 <div class="w-full">
                     <button type="button" class="btn btn-warning w-full" onclick="window.location.href='{{ url_for('add_modules') }}'">
                         Ajouter un module
@@ -35,11 +35,11 @@
             <tbody>
                 {% for element in modules_info %}
                     <tr>
-                        <th scope="row">{{ element[0] }}</th>
-                        <td>{{ element[2] }}</td>
-                        <td><a href="{{ element[3] }}" target="_blank" class="link">{{ element[3] }}</a></td>
-                        <td>{{ element[5] }}</td>
-                        <td><button onclick="window.location.href='{{ url_for('show_modules', module_token=element[1]) }}'" class="btn btn-secondary">Plus d'info</button></td>
+                        <th scope="row">{{ element.id }}</th>
+                        <td>{{ element.name }}</td>
+                        <td><a href="{{ element.fqdn }}" target="_blank" class="link">{{ element.fqdn }}</a></td>
+                        <td>{{ element.status }}</td>
+                        <td><button onclick="window.location.href='{{ url_for('show_modules', module_token=element.token) }}'" class="btn btn-secondary">Plus d'info</button></td>
                     </tr>
                 {% endfor %}
             </tbody>
