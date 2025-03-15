@@ -23,7 +23,6 @@ def sso_login_cogs(database, error, global_domain):
         row = database.query(User.password, User.token, User.A2F).filter(User.username == username).first()
         validation_code = database.query(Config.content).filter(Config.name == "secret_token").scalar()
         domain_to_redirect = database.query(Module.fqdn).filter(Module.name == request.args.get('modules')).first()
-        print(domain_to_redirect)
 
         if row is None:  # Si aucune correspondance, redirect vers la page de login avec le message d'erreur n°1
             return redirect(url_for('sso_login', error='1'))

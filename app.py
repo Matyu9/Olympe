@@ -144,17 +144,17 @@ def add_modules():
 @app.route('/admin/modules/maintenance/', methods=['POST'])
 def maintenance():
     from Cogs.Administration.Modules.maintenance import maintenance_cogs
-    return maintenance_cogs(get_db(Session))
+    return maintenance_cogs(get_db(Session)) ###
 
 
 @app.route('/admin/smtp/config/', methods=['POST', 'GET'])
 def smtp_config():
-    return smtp_config_cogs(database)
+    return smtp_config_cogs(get_db(Session)) ###
 
 
 @app.route('/admin/smtp/config/test', methods=['POST'])
 def smtp_test():
-    return smtp_test_cogs(database)
+    return smtp_test_cogs(get_db(Session)) ###
 
 
 """
@@ -164,7 +164,7 @@ def smtp_test():
 
 @app.route('/sso/login/', methods=['GET', 'POST'])
 def sso_login(error=0):
-    return sso_login_cogs(get_db(Session), error, config_data['modules'][0]['global_domain'])
+    return sso_login_cogs(get_db(Session), error, config_data['modules'][0]['global_domain']) ###
 
 @app.route('/sso/login/api', methods=['POST'])
 def api_sso_login(error=0):
@@ -172,7 +172,7 @@ def api_sso_login(error=0):
 
 @app.route('/sso/logout/', methods=['GET'])
 def sso_logout():
-    return sso_logout_cogs()
+    return sso_logout_cogs() ###
 
 """
     Partie Socket
