@@ -2,7 +2,10 @@ from flask import request, jsonify
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from werkzeug.exceptions import BadRequestKeyError
-from pyotp import totp
+from Utils.verify_login import verify_A2F
+
+from Utils.Database.user import User
+from Utils.Database.config import Config
 
 
 def api_login_cogs(database, error):
@@ -13,15 +16,13 @@ def api_login_cogs(database, error):
     username = request.json['username']  # Sauvegarde du nom d'utilisateur
     password = request.json['password']  # Sauvegarde du mot de passe
 
-    # Séléction des données requise pour valider la connexion.
-    row = database.select("""SELECT password, token, A2F FROM cantina_administration.user WHERE username = %s""",
-                          (username,), number_of_data=1)
+    # Séléction des données requises pour valider la connexion.
+    row = database.query(User).filter(User.username == username).first()
 
-    validation_code = database.select("""SELECT content FROM cantina_pensive.config WHERE name=%s""",
-                                      ('secret_token',), number_of_data=1)
+    validation_code = database.query(Config.content).filter(Config.name == "secret_token").scalar()
 
     try:
-        dfa_code = request.json['dfa_code']  # Sauvegarde du code d'A2F si l'utilisateur en à rempli un
+        dfa_code = request.json['dfa_code']  # Sauvegarde du code d'A2F si l'utilisateur en a rempli un
     except BadRequestKeyError:
         dfa_code = None
 
@@ -29,16 +30,16 @@ def api_login_cogs(database, error):
         status_code = 401
 
     try:
-        PasswordHasher().verify(row[0], password)  # Verification de la correspondance du MDP
+        PasswordHasher().verify(row.password, password)  # Verification de la correspondance du MDP
 
-        if row[2] and dfa_code is None or row[2] and not dfa_code:
+        if row.A2F and dfa_code is None or row.A2F and not dfa_code:
             # Si l'A2F est activé, mais qu'aucun code n'est fournis
             status_code = 418
-        elif not row[2] or verify_A2F(database):  # Si l'A2F n'est pas activé ou que le code est correcte
+        elif not row.A2F or verify_A2F(row.A2F_secret):  # Si l'A2F n'est pas activé ou que le code est correcte
             credentials_status = True
-            unique_id = row[1]
-            secret_id = validation_code[0]
-        else:  # Dans tout les autres cas
+            unique_id = row.token
+            secret_id = validation_code
+        else:  # Dans tous les autres cas
             status_code = 401
 
     except VerifyMismatchError:  # Si le MDP ne correspond pas, redirect vers le login avec le message d'erreur n°1
@@ -55,12 +56,3 @@ def api_login_cogs(database, error):
     print(jsonify(json_to_send))
     return jsonify(json_to_send)
 
-
-def verify_A2F(database):
-    try:
-        key = totp.TOTP(database.select('''SELECT A2F_secret FROM cantina_administration.user WHERE username=%s''',
-                                        (request.json['username']), number_of_data=1)[0])
-        return key.verify(request.json['dfa_code'].replace(" ", ""))
-
-    except BadRequestKeyError:
-        return None

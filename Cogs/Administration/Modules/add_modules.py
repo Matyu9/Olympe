@@ -9,9 +9,6 @@ from Utils.Database.modules import Module
 
 def add_modules_cogs(database):
     if verify_login(database) and verify_login(database) != 'desactivated':
-        # On récupère les modules afin de pouvoir faire une redirection sur la page via la sidebar
-        modules_info = database.query(Module).all()
-
         # On récupère les données de l'utilisateur afin de pouvoir l'afficher
         user_data = database.query(User).filter(User.token == request.cookies.get('token')).first()
 

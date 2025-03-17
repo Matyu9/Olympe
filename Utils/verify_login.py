@@ -17,7 +17,7 @@ def verify_login(database):
     validation = request.cookies.get('validation')
     validation_from_db = database.query(Config.content).filter(Config.name == "secret_token").scalar()
 
-    return True if token_validation is not None and validation == validation_from_db[0] else False
+    return True if token_validation is not None and validation == validation_from_db else False
 
 
 def verify_A2F(A2F_secret):
@@ -26,4 +26,7 @@ def verify_A2F(A2F_secret):
     except BadRequestKeyError:
         key = totp.TOTP(A2F_secret)
 
-    return key.verify(request.form['a2f-code'].replace(" ", ""))
+    try: # Utilisation classique via le formulaire
+        return key.verify(request.form['a2f-code'].replace(" ", ""))
+    except BadRequestKeyError: # Sinon utilisation de l'API
+        return key.verify(request.json['dfa_code'].replace(" ", ""))

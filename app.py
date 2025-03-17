@@ -138,7 +138,7 @@ def show_modules():
 
 @app.route('/admin/modules/add/', methods=['POST', 'GET'])
 def add_modules():
-    return add_modules_cogs(get_db(Session))
+    return add_modules_cogs(get_db(Session)) ###
 
 
 @app.route('/admin/modules/maintenance/', methods=['POST'])
@@ -168,7 +168,7 @@ def sso_login(error=0):
 
 @app.route('/sso/login/api', methods=['POST'])
 def api_sso_login(error=0):
-    return api_login_cogs(get_db(Session), error)
+    return api_login_cogs(get_db(Session), error) ###
 
 @app.route('/sso/logout/', methods=['GET'])
 def sso_logout():
