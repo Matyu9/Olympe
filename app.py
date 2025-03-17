@@ -73,27 +73,27 @@ def close_db(error=None):
 
 @app.route('/', methods=['GET'])
 def home():
-    return user_home_cogs(get_db(Session)) ###
+    return user_home_cogs(get_db(Session))
 
 
 @app.route('/user_space/get_profile_picture')
 def get_profile_picture():
-    return get_profile_picture_cogs(app.config['UPLOAD_FOLDER']) ###
+    return get_profile_picture_cogs(app.config['UPLOAD_FOLDER'])
 
 
 @app.route('/user_space/', methods=['GET', 'POST'])
 def user_space():
-    return user_space_cogs(get_db(Session), app.config['UPLOAD_FOLDER']) ###
+    return user_space_cogs(get_db(Session), app.config['UPLOAD_FOLDER'])
 
 
 @app.route('/2FA/add/', methods=['GET', 'POST'])
 def double2FA_add():
-    return doubleFA_add_cogs(get_db(Session)) ###
+    return doubleFA_add_cogs(get_db(Session))
 
 
 @app.route('/email/verif/', methods=['GET', 'POST'])
 def email_verif():
-    return email_verif_cogs(get_db(Session)) ###
+    return email_verif_cogs(get_db(Session))
 
 
 """
@@ -103,58 +103,58 @@ def email_verif():
 
 @app.route('/admin/user/', methods=['GET', 'POST'])
 def show_user():
-    return show_user_cogs(get_db(Session), app.config['UPLOAD_FOLDER']) ###
+    return show_user_cogs(get_db(Session), app.config['UPLOAD_FOLDER'])
 
 
 @app.route('/admin/user/add/', methods=['GET', 'POST'])
 def add_user():
-    return add_user_cogs(get_db(Session)) ###
+    return add_user_cogs(get_db(Session))
 
 
 @app.route('/admin/user/edit_permission/', methods=['POST'])
 def edit_permission_user():
-    return edit_user_permission_cogs(get_db(Session)) ###
+    return edit_user_permission_cogs(get_db(Session))
 
 
 @app.route('/admin/user/desactivate/', methods=['POST'])
 def desactivate_user():
-    return desactivate_user_cogs(get_db(Session)) ###
+    return desactivate_user_cogs(get_db(Session))
 
 
 @app.route('/admin/user/delete/', methods=['POST'])
 def delete_user():
-    return delete_user_cogs(get_db(Session)) ###
+    return delete_user_cogs(get_db(Session))
 
 
 @app.route('/admin/permission/global/', methods=['POST', 'GET'])
 def global_permission():
-    return global_permission_cogs(get_db(Session)) ###
+    return global_permission_cogs(get_db(Session))
 
 
 @app.route('/admin/modules/', methods=['POST', 'GET'])
 def show_modules():
-    return show_modules_cogs(get_db(Session)) ###
+    return show_modules_cogs(get_db(Session))
 
 
 @app.route('/admin/modules/add/', methods=['POST', 'GET'])
 def add_modules():
-    return add_modules_cogs(get_db(Session)) ###
+    return add_modules_cogs(get_db(Session))
 
 
 @app.route('/admin/modules/maintenance/', methods=['POST'])
 def maintenance():
     from Cogs.Administration.Modules.maintenance import maintenance_cogs
-    return maintenance_cogs(get_db(Session)) ###
+    return maintenance_cogs(get_db(Session))
 
 
 @app.route('/admin/smtp/config/', methods=['POST', 'GET'])
 def smtp_config():
-    return smtp_config_cogs(get_db(Session)) ###
+    return smtp_config_cogs(get_db(Session))
 
 
 @app.route('/admin/smtp/config/test', methods=['POST'])
 def smtp_test():
-    return smtp_test_cogs(get_db(Session)) ###
+    return smtp_test_cogs(get_db(Session))
 
 
 """
@@ -164,15 +164,15 @@ def smtp_test():
 
 @app.route('/sso/login/', methods=['GET', 'POST'])
 def sso_login(error=0):
-    return sso_login_cogs(get_db(Session), error, config_data['modules'][0]['global_domain']) ###
+    return sso_login_cogs(get_db(Session), error, config_data['modules'][0]['global_domain'])
 
 @app.route('/sso/login/api', methods=['POST'])
 def api_sso_login(error=0):
-    return api_login_cogs(get_db(Session), error) ###
+    return api_login_cogs(get_db(Session), error)
 
 @app.route('/sso/logout/', methods=['GET'])
 def sso_logout():
-    return sso_logout_cogs() ###
+    return sso_logout_cogs()
 
 """
     Partie Socket
