@@ -95,15 +95,16 @@
         <ul class="menu pt-5 mt-5 space-y-2 border-primary border-t">
             {% for element in modules_info %}
                 <li>
-                    <a href="{{ element.fqdn }}" target="_blank" class="flex items-center p-2 ">
-                        <svg aria-hidden="true" class="w-6 h-6 transition duration-75" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <button type="button" class="btn flex items-center gap-2"
+                        {% if element.maintenance %} title="En maintenance" disabled {% else %}onclick="window.open('{{ element.fqdn }}', '_blank')"{% endif %}>
+                        <svg aria-hidden="true" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                             <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"></path>
                             <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"></path>
                             <path d="M16 5l3 3"></path>
                         </svg>
-                        <span class="ml-3">{{ element.name }}</span>
-                    </a>
+                        <span>{{ element.name }}</span>
+                    </button>
                 </li>
             {% endfor %}
             <li>

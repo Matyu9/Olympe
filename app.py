@@ -47,7 +47,7 @@ app.config['UPLOAD_FOLDER'] = path.abspath(path.join(getcwd(), "static/ProfilePi
 engine_sql = create_engine(
     f"mysql+pymysql://{config_data['database'][0]['username']}:{config_data['database'][0]['password']}@{config_data['database'][0]['address']}:{config_data['database'][0]['port']}/{config_data['database'][0]['name']}",
     pool_size=20,        # Max 10 connexions en parallèle
-    max_overflow=40,     # 20 connexions supplémentaires si besoin
+    max_overflow=40,      # 20 connexions supplémentaires si besoin
     pool_timeout=30,     # Temps max d’attente pour une connexion libre
     pool_recycle=1800    # Ferme et recrée une connexion après 30 min
 )

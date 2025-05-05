@@ -8,13 +8,14 @@ from os import path, remove
 from Utils.Database.modules import Module
 from Utils.Database.user import User
 from Utils.Database.permission import Permission
+from Utils.Database.config import Config
 
 
 def user_space_cogs(database, upload_path):
     # Verification si l'utilisateur est connecté
     if not verify_login(database):
         return redirect(url_for('sso_login', error='0'))
-    elif verify_login(database) == 'desactivated':  # Si l'utilisateur est connecté mais que son compte est désactivé
+    elif verify_login(database) == 'desactivated':  # Si l'utilisateur est connecté, mais que son compte est désactivé
         login_url = database.query(Module.fqdn).filter(Module.name == "olympe").first().fqdn
         return redirect(login_url+'/sso/login/?error=2')
 
@@ -26,9 +27,11 @@ def user_space_cogs(database, upload_path):
         user_permission = database.query(Permission).filter(Permission.user_token == request.cookies.get('token')).first()
         # On récupère les modules afin de pouvoir faire une redirection sur la page via la sidebar
         modules_info = database.query(Module).all()
+        # On récupère les permissions générales
+        general_permission = {config.name: int(config.content)   for config in database.query(Config).filter(Config.name.startswith('edit_')).all()} # in {"edit_username":1, "edit_password":1, "edit_email":1, "edit_profile_picture":1, "edit_a2f":1}
 
         return render_template('User/user_space.html', user_information=user_information,
-                               user_permission=user_permission, modules_info=modules_info)
+                               user_permission=user_permission, modules_info=modules_info, general_permission=general_permission)
 
     elif request.method == 'POST':
         try:
@@ -100,4 +103,6 @@ def user_space_cogs(database, upload_path):
                 database.commit()
 
         return redirect(url_for('user_space'))
+
+    return None
         

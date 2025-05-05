@@ -75,7 +75,7 @@
                 </div>
                 <div class="card-body">
                     <div style="gap: .5rem !important;">
-                        {% if user_permission.edit_username %}
+                        {% if (user_permission.edit_username and general_permission.edit_username) or user_permission.admin %}
                             <div class="bg-base-200 p-4 rounded-lg">
                                 <div class="text-sm opacity-70 mb-1">Nom d'utilisateur</div>
                                 <div class="font-semibold">
@@ -91,7 +91,7 @@
                             </div>
                         {% endif %}
                         <hr style="height:.5rem; visibility:hidden;" />
-                        {% if user_permission.edit_password %}
+                        {% if (user_permission.edit_password and general_permission.edit_password) or user_permission.admin %}
                             <div class="bg-base-200 p-4 rounded-lg">
                                 <div class="text-sm opacity-70 mb-1">Mot de passe</div>
                                 <div class="font-semibold">
@@ -116,11 +116,11 @@
                             </div>
                         {% endif %}
                         <hr style="height:.5rem; visibility:hidden;" />
-                        {% if user_permission.edit_email %}
+                        {% if (user_permission.edit_email and general_permission.edit_email) or user_permission.admin %}
                             <div class="bg-base-200 p-4 rounded-lg">
                                 <div class="text-sm opacity-70 mb-1">Email</div>
                                 <div class="font-semibold">
-                                    <input type="email" value="{{ user_information.email }}" name="email" class="input w-full max-w-xs">
+                                    <input type="email" value="{{ user_informatio n.email }}" name="email" class="input w-full max-w-xs">
                                 </div>
                             </div>
                         {% else %}
@@ -135,7 +135,7 @@
                             <div class="font-semibold">{% if not user_information.A2F or user_information.A2F == 0 %} Désactivé {% else %} Activé {% endif %}</div>
                         </div>
                         <hr style="height:.5rem; visibility:hidden;" />
-                        {% if user_permission.edit_theme %}
+                        {% if (user_permission.edit_theme) or user_permission.admin %}
                             <div class="bg-base-200 p-4 rounded-lg">
                                 <label for="theme-select" class="text-sm opacity-70 mb-1 block">Thème</label>
                                 <select id="theme-select" name="theme" class="select select-bordered w-full max-w-xs">
