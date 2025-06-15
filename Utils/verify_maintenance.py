@@ -11,8 +11,8 @@ def verify_maintenance(database, maintenance):
             if maintenance and not user_permission[0]:
                 return render_template("User/maintenance.html")
             elif maintenance and user_permission[0]:
-                pass
+                return None
             else:
-                pass
+                return None
     else:
-        pass
+        return None

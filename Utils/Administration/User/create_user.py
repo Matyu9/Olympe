@@ -1,5 +1,4 @@
 from uuid import uuid3, uuid1
-from werkzeug.exceptions import BadRequestKeyError
 from argon2 import PasswordHasher
 from flask import request
 

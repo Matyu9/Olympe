@@ -63,3 +63,5 @@ def sso_login_cogs(database, error, global_domain):
 
         # Sinon, affichage de la page de connexion
         return render_template('SSO/login.html', error=error)
+    else:
+        return None

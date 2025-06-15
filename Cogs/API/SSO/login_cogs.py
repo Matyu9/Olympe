@@ -53,6 +53,6 @@ def api_login_cogs(database, error):
         "unique_id": unique_id,
         "secret_id": secret_id
     }
-    print(jsonify(json_to_send))
+
     return jsonify(json_to_send)
 

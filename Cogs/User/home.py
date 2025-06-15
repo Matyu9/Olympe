@@ -27,3 +27,6 @@ def user_home_cogs(database):
 
         return render_template('User/index.html', user_information=user_information,
                                user_permission=user_permission, modules_info=modules_info, nb_user=nb_user, nb_module=nb_module)
+
+    else:
+        return None
