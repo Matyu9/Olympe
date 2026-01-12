@@ -46,7 +46,7 @@ app.config['UPLOAD_FOLDER'] = path.abspath(path.join(getcwd(), "static/ProfilePi
 
 
 engine_sql = create_engine(
-    f"mysql+pymysql://{config_data['database'][0]['username']}:{config_data['database'][0]['password']}@{config_data['database'][0]['address']}:{config_data['database'][0]['port']}/{config_data['database'][0]['name']}",
+    f"mysql+pymysql://{config_data['database'][0]['username']}:{config_data['database'][0]['password']}@{config_data['database'][0]['address']}:{config_data['database'][0]['port']}/", #{config_data['database'][0]['name']}
     pool_size=20,        # Max 10 connexions en parallèle
     max_overflow=40,      # 20 connexions supplémentaires si besoin
     pool_timeout=30,     # Temps max d’attente pour une connexion libre
@@ -164,7 +164,8 @@ def smtp_test():
 
 @app.route('/sso/login/', methods=['GET', 'POST'])
 def sso_login(error=0):
-    return sso_login_cogs(get_db(Session_SQL), error, config_data['modules'][0]['global_domain'])
+    return sso_login_cogs(get_db(Session_SQL), error, config_data['modules'][0]['global_domain'],
+                          config_data['modules'][0]["secret_key"])
 
 @app.route('/sso/logout/', methods=['GET'])
 def sso_logout():
@@ -176,8 +177,7 @@ def sso_logout():
 
 @socketio.on('heartbeat')
 def heart_beat(data):
-    database = ""
-    return heart_beat_cogs(data, database)
+    return heart_beat_cogs(data, get_db(Session_SQL))
 
 @socketio.on('ping_server')
 def ping_server_socket():

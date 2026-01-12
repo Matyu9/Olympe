@@ -7,13 +7,13 @@
     <script type="module">
         import { io } from "https://cdn.socket.io/4.8.1/socket.io.esm.min.js";
 
-        const socket = io('http://127.0.0.1:3001');
+        const socket = io('http://127.0.0.1:3000');
 
         socket.on('connect', () => {
             console.log('Connecté au serveur distant');
             socket.emit('heartbeat', {
-                "fqdn": window.location.origin,
-                "token": "ec696969-6969-6969-6969-2e227b76fec2",
+                "fqdn": "127.0.0.1:3000",
+                "token": "",
                 "date": Math.floor(Date.now() / 1000)
             });
         });

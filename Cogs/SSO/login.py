@@ -9,7 +9,7 @@ from Utils.Database.config import Config
 from Utils.Database.modules import Module
 
 
-def sso_login_cogs(database, error, global_domain):
+def sso_login_cogs(database, error, global_domain, validation_code):
     if request.method == 'POST':  # Si l'utilisateur à remplir le formulaire
         username = request.form['username']  # Sauvegarde du nom d'utilisateur
         password = request.form['password']  # Sauvegarde du mot de passe
@@ -21,7 +21,7 @@ def sso_login_cogs(database, error, global_domain):
 
         # Séléction des données requises pour valider la connexion.
         row = database.query(User).filter(User.username == username).first()
-        validation_code = database.query(Config.content).filter(Config.name == "secret_token").scalar()
+        # validation_code = database.query(Config.content).filter(Config.name == "secret_token").scalar()
         domain_to_redirect = database.query(Module.fqdn).filter(Module.name == request.args.get('modules')).first()
 
         if row is None:  # Si aucune correspondance, redirect vers la page de login avec le message d'erreur n°1
@@ -35,7 +35,8 @@ def sso_login_cogs(database, error, global_domain):
 
             elif not row.A2F or verify_A2F(row.A2F_secret):  # Si l'A2F n'est pas activé ou que le code est correcte
                 if domain_to_redirect is None:
-                    response = make_response(redirect(url_for('home')))
+                    url = url_for('home')
+                    response = make_response(redirect(url, code=302))
                 else:
                     response = make_response(redirect(domain_to_redirect, code=302))
 

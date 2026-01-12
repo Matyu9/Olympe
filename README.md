@@ -30,7 +30,9 @@ Remplisser le fichier `config.json` avec ça:
     "name": "Olympe",
     "port": 3000,
     "maintenance": false,
-    "debug_mode": false
+    "debug_mode": false,
+    "secret_key": "un_uuid",
+    "global_domain": "127.0.0.1:3000"
   }]
 }
 ``` 

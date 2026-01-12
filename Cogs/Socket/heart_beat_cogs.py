@@ -4,7 +4,7 @@ from time import time
 from Utils.Database.modules import Module
 
 def heart_beat_cogs(data, database):
-    fqdn_data = database.query(Module).filter(Module.token == data["token"])
+    fqdn_data = database.query(Module).filter(Module.token == data["token"]).first()
     server_time = round(time())
     saved_time = round((data['date']+server_time)/2)
 
