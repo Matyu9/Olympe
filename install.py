@@ -7,6 +7,20 @@ from argon2 import PasswordHasher
 from pymysql import connect
 
 
+deprecated = """
+  $$$$$$$\                                                              $$\                     $$\ 
+  $$  __$$\                                                             $$ |                    $$ |
+  $$ |  $$ | $$$$$$\   $$$$$$\   $$$$$$\   $$$$$$\   $$$$$$$\ $$$$$$\ $$$$$$\    $$$$$$\   $$$$$$$ |
+  $$ |  $$ |$$  __$$\ $$  __$$\ $$  __$$\ $$  __$$\ $$  _____|\____$$\\_$$  _|  $$  __$$\ $$  __$$ |
+  $$ |  $$ |$$$$$$$$ |$$ /  $$ |$$ |  \__|$$$$$$$$ |$$ /      $$$$$$$ | $$ |    $$$$$$$$ |$$ /  $$ |
+  $$ |  $$ |$$   ____|$$ |  $$ |$$ |      $$   ____|$$ |     $$  __$$ | $$ |$$\ $$   ____|$$ |  $$ |
+  $$$$$$$  |\$$$$$$$\ $$$$$$$  |$$ |      \$$$$$$$\ \$$$$$$$\\$$$$$$$ | \$$$$  |\$$$$$$$\ \$$$$$$$ |
+  \_______/  \_______|$$  ____/ \__|       \_______| \_______|\_______|  \____/  \_______| \_______|
+                      $$ |                                                                          
+                      $$ |                                                                          
+                      \__|                                                                          
+"""
+
 def create_user():
     token = str(uuid3(uuid1(), str(uuid1())))  # Génération d'un token unique
     hashed_password = PasswordHasher().hash(password)  # Hashage des mots de passe
@@ -17,7 +31,7 @@ def create_user():
 
     # Création des permissions de l'utilisateur dans la base de données
     cursor.execute("""INSERT INTO cantina_administration.permission(user_token, show_log, edit_username, edit_email, 
-    edit_password, edit_profile_picture, edit_A2F, edit_ergo, show_specific_account, edit_username_admin, 
+    edit_password, edit_profile_picture, edit_A2F, edit_theme, show_specific_account, edit_username_admin, 
     edit_email_admin, edit_password_admin, edit_profile_picture_admin, allow_edit_username, allow_edit_email, 
     allow_edit_password, allow_edit_profile_picture, allow_edit_A2F, create_user, delete_account, desactivate_account, 
     edit_permission, show_all_modules, on_off_modules, on_off_maintenance, delete_modules, add_modules, 
@@ -48,6 +62,8 @@ based_on = None
 os_info = uname()
 database = [False, False]
 ph = PasswordHasher()
+
+exit(deprecated)
 
 if getuid() != 0:
     exit("L'installation doit être faite avec les permissions d'administrateur!")
@@ -125,7 +141,7 @@ cursor.execute("""CREATE TABLE IF NOT EXISTS cantina_administration.user(id INT 
 token TEXT NOT NULL,  username TEXT NOT NULL, password TEXT NOT NULL, email TEXT NOT NULL, 
 email_verified BOOL DEFAULT FALSE, email_verification_code TEXT, picture BOOL DEFAULT false, 
 A2F BOOL DEFAULT FALSE, A2F_secret TEXT, last_connection DATE, 
-desactivated BOOL DEFAULT FALSE, theme TEXT DEFAULT 'light')""", None)
+desactivated BOOL DEFAULT FALSE, theme TEXT DEFAULT 'light', super_admin BOOL DEFAULT FALSE)""", None)
 cursor.execute("""CREATE TABLE IF NOT EXISTS cantina_administration.config(id INT PRIMARY KEY AUTO_INCREMENT, 
 name TEXT, content TEXT)""", None)
 cursor.execute("""CREATE TABLE IF NOT EXISTS cantina_administration.modules(id INT PRIMARY KEY AUTO_INCREMENT, 
@@ -134,7 +150,7 @@ socket_url TEXT DEFAULT '/socket/', last_heartbeat INT)""", None)
 cursor.execute("""CREATE TABLE IF NOT EXISTS cantina_administration.permission(id INT PRIMARY KEY AUTO_INCREMENT,
 user_token TEXT NOT NULL, show_log BOOL DEFAULT FALSE, edit_username BOOL DEFAULT FALSE, edit_email BOOL DEFAULT FALSE, 
 edit_password BOOL DEFAULT FALSE, edit_profile_picture BOOL DEFAULT FALSE, edit_A2F BOOL DEFAULT FALSE, 
-edit_ergo BOOL DEFAULT FALSE, show_specific_account BOOL DEFAULT FALSE, edit_username_admin BOOL DEFAULT FALSE,
+edit_theme BOOL DEFAULT FALSE, show_specific_account BOOL DEFAULT FALSE, edit_username_admin BOOL DEFAULT FALSE,
 edit_email_admin BOOL DEFAULT FALSE, edit_password_admin BOOL DEFAULT FALSE, 
 edit_profile_picture_admin BOOl DEFAULT FALSE, allow_edit_username BOOL DEFAULT FALSE, 
 allow_edit_email BOOL DEFAULT FALSE, allow_edit_password BOOL DEFAULT FALSE,

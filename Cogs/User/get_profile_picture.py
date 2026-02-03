@@ -2,7 +2,7 @@ from flask import request, url_for, redirect
 from os import path
 
 
-def get_profile_picture_cogs(database, upload_path):
+def get_profile_picture_cogs(upload_path):
     if request.args.get("token"):
         token = request.args.get("token")
     else:

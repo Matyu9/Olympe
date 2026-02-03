@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="{{ local_user_theme[0] }}">
+<html lang="fr" data-theme="{{ user_data.theme }}">
 <head>
     <meta charset="UTF-8">
     <title>Cantina - Olympe</title>
@@ -23,10 +23,10 @@
                 </div>
 
                 <!-- Deuxième bouton (conditionnel) -->
-                {% if user_permission[20] or user_permission[32] %}
+                {% if user_permission.delete_account or user_permission.admin %}
                     <div class="w-full">
                         <form action="{{ url_for('delete_user') }}" method="post" id="delete_account" class="w-full">
-                            <input type='hidden' name='token_to_delete' value="{{ selected_user_info[1] }}"/>
+                            <input type='hidden' name='token_to_delete' value="{{ selected_user_info.token }}"/>
                             <button type="button" class="btn btn-warning w-full" onclick="delete_account()">
                                 Supprimer le compte
                             </button>
@@ -35,15 +35,15 @@
                 {% endif %}
 
                 <!-- Troisième bouton (conditionnel) -->
-                {% if user_permission[21] or user_permission[32] and selected_user_info[1] != request.cookies.get('token') %}
+                {% if user_permission.desactivate_account or user_permission.admin and selected_user_info.token != request.cookies.get('token') %}
                     <div class="w-full">
                         <form action="{{ url_for('desactivate_user') }}" method="post" id="desactivate_account" class="w-full">
-                            <input type='hidden' name='token_to_desactivate' value="{{ selected_user_info[1] }}"/>
-                            {% if not selected_user_info[12] or selected_user_info[12] == 0 %}
+                            <input type='hidden' name='token_to_desactivate' value="{{ selected_user_info.token }}"/>
+                            {% if not selected_user_info.desactivated or selected_user_info.desactivated == 0 %}
                                 <button type="button" class="btn btn-warning w-full" onclick="desactivate_account(1)">
                                     Désactiver le compte
                                 </button>
-                            {% elif selected_user_info[12] == 1 %}
+                            {% elif selected_user_info.desactivated == 1 %}
                                 <button type="button" class="btn btn-warning w-full" onclick="desactivate_account(0)">
                                     Réactiver le compte
                                 </button>
@@ -57,7 +57,7 @@
                     <div class="w-48 h-full">
                         <img
                             class="w-full h-full rounded-lg object-contain"
-                            src="{{ url_for('get_profile_picture', token=selected_user_info[1]) }}"
+                            src="{{ url_for('get_profile_picture', token=selected_user_info.token) }}"
                             alt="profile_picture"
                         />
                     </div>
@@ -65,7 +65,7 @@
                 <div class="card-body">
                     <div class="bg-base-200 p-4 rounded-lg">
                         <div class="text-sm opacity-70 mb-1">Nom d'utilisateur</div>
-                        <div class="font-semibold">{{ selected_user_info[2] }}</div>
+                        <div class="font-semibold">{{ selected_user_info.username }}</div>
                     </div>
                     <div class="bg-base-200 p-4 rounded-lg">
                         <div class="text-sm opacity-70 mb-1">Mot de passe</div>
@@ -73,15 +73,15 @@
                     </div>
                     <div class="bg-base-200 p-4 rounded-lg">
                         <div class="text-sm opacity-70 mb-1">Email</div>
-                        <div class="font-semibold">{{selected_user_info[4]}}</div>
+                        <div class="font-semibold">{{ selected_user_info.email }}</div>
                     </div>
                     <div class="bg-base-200 p-4 rounded-lg">
                         <div class="text-sm opacity-70 mb-1">Authetification à deux facteurs</div>
-                        <div class="font-semibold">{% if not selected_user_info[8] or selected_user_info[8] == 0 %} Désactivé {% else %} Activé {% endif %}</div>
+                        <div class="font-semibold">{% if not selected_user_info.A2F or selected_user_info.A2F == 0 %} Désactivé {% else %} Activé {% endif %}</div>
                     </div>
                     <div class="bg-base-200 p-4 rounded-lg">
                         <div class="text-sm opacity-70 mb-1">Thème</div>
-                        <div class="font-semibold">{{ selected_user_info[12] }}</div>
+                        <div class="font-semibold">{{ selected_user_info.theme }}</div>
                     </div>
                     <div class="card-actions justify-end">
                         <button class="btn btn-primary" onclick="showUserForm()">Modifier les modifications du comptes</button>
@@ -96,10 +96,10 @@
                             <div class="flex flex-col items-center w-48">
                                 <img
                                     class="w-full h-full rounded-lg object-contain"
-                                    src="{{ url_for('get_profile_picture', token=selected_user_info[1]) }}"
+                                    src="{{ url_for('get_profile_picture', token=selected_user_info.token) }}"
                                     alt="profile_picture"
                                 />
-                                {% if user_permission[13] %}
+                                {% if user_permission.edit_profile_picture_admin %}
                                     <input type="file" class="file-input file-input-sm w-full max-w-xs mt-2" name="profile_picture" />
                                 {% endif %}
                             </div>
@@ -107,23 +107,23 @@
                     </div>
 
                     <div class="card-body space-y-4 flex-grow">
-                        <input type="hidden" value="{{ selected_user_info[1] }}" name="token">
+                        <input type="hidden" value="{{ selected_user_info.token }}" name="token">
 
-                        {% if user_permission[10] or user_permission[32] %}
+                        {% if user_permissionedit_username_admin or user_permission.admin %}
                             <div class="bg-base-200 p-4 rounded-lg">
                                 <div class="text-sm opacity-70 mb-1">Nom d'utilisateur</div>
                                 <div class="font-semibold">
-                                    <input type="text" value="{{ selected_user_info[2] }}" name="username" class="input w-full max-w-xs">
+                                    <input type="text" value="{{ selected_user_info.username }}" name="username" class="input w-full max-w-xs">
                                 </div>
                             </div>
                         {% else %}
                             <div class="bg-base-200 p-4 rounded-lg">
                                 <div class="text-sm opacity-70 mb-1">Nom d'utilisateur</div>
-                                <div class="font-semibold">{{ selected_user_info[2] }}</div>
+                                <div class="font-semibold">{{ selected_user_info.username }}</div>
                             </div>
                         {% endif %}
 
-                        {% if user_permission[12] or user_permission[32] %}
+                        {% if user_permission.edit_password_admin or user_permission.admin %}
                             <div class="bg-base-200 p-4 rounded-lg">
                                 <div class="text-sm opacity-70 mb-1">Mot de passe</div>
                                 <div class="font-semibold">
@@ -143,67 +143,67 @@
                             </div>
                         {% endif %}
 
-                        {% if user_permission[11] or user_permission[32] %}
+                        {% if user_permission.edit_email_admin or user_permission.admin %}
                             <div class="bg-base-200 p-4 rounded-lg">
                                 <div class="text-sm opacity-70 mb-1">Email</div>
                                 <div class="font-semibold">
-                                    <input type="email" value="{{ selected_user_info[4] }}" name="email" class="input  w-full max-w-xs">
+                                    <input type="email" value="{{ selected_user_info.email }}" name="email" class="input  w-full max-w-xs">
                                 </div>
                             </div>
                         {% else %}
                             <div class="bg-base-200 p-4 rounded-lg">
                                 <div class="text-sm opacity-70 mb-1">Email</div>
-                                <div class="font-semibold">{{ selected_user_info[4] }}</div>
+                                <div class="font-semibold">{{ selected_user_info.email }}</div>
                             </div>
                         {% endif %}
 
                         <div class="bg-base-200 p-4 rounded-lg">
                             <div class="text-sm opacity-70 mb-1">Authentification à deux facteurs</div>
-                            <div class="font-semibold">{% if not selected_user_info[8] or selected_user_info[8] == 0 %} Désactivé {% else %} Activé {% endif %}</div>
+                            <div class="font-semibold">{% if not selected_user_info.A2F or selected_user_info.A2F == 0 %} Désactivé {% else %} Activé {% endif %}</div>
                         </div>
 
-                        {% if user_permission[10] or user_permission[32] %}
+                        {% if user_permission.admin %}
                             <div class="bg-base-200 p-4 rounded-lg">
                                 <label for="theme-select" class="opacity-70 mb-1 block">Thème</label>
                                 <select id="theme-select" name="theme" class="select select-bordered w-full max-w-xs">
-                                    <option value="light" {% if selected_user_info[12] == 'light' %}selected{% endif %}>Light</option>
-                                    <option value="dark" {% if selected_user_info[12] == 'dark' %}selected{% endif %}>Dark</option>
-                                    <option value="cupcake" {% if selected_user_info[12] == 'cupcake' %}selected{% endif %}>Cupcake</option>
-                                    <option value="bumblebee" {% if selected_user_info[12] == 'bumblebee' %}selected{% endif %}>Bumblebee</option>
-                                    <option value="emerald" {% if selected_user_info[12] == 'emerald' %}selected{% endif %}>Emerald</option>
-                                    <option value="corporate" {% if selected_user_info[12] == 'corporate' %}selected{% endif %}>Corporate</option>
-                                    <option value="synthwave" {% if selected_user_info[12] == 'synthwave' %}selected{% endif %}>Synthwave</option>
-                                    <option value="retro" {% if selected_user_info[12] == 'retro' %}selected{% endif %}>Retro</option>
-                                    <option value="cyberpunk" {% if selected_user_info[12] == 'cyberpunk' %}selected{% endif %}>Cyberpunk</option>
-                                    <option value="valentine" {% if selected_user_info[12] == 'valentine' %}selected{% endif %}>Valentine</option>
-                                    <option value="halloween" {% if selected_user_info[12] == 'halloween' %}selected{% endif %}>Halloween</option>
-                                    <option value="garden" {% if selected_user_info[12] == 'garden' %}selected{% endif %}>Garden</option>
-                                    <option value="forest" {% if selected_user_info[12] == 'forest' %}selected{% endif %}>Forest</option>
-                                    <option value="aqua" {% if selected_user_info[12] == 'aqua' %}selected{% endif %}>Aqua</option>
-                                    <option value="lofi" {% if selected_user_info[12] == 'lofi' %}selected{% endif %}>Lofi</option>
-                                    <option value="pastel" {% if selected_user_info[12] == 'pastel' %}selected{% endif %}>Pastel</option>
-                                    <option value="fantasy" {% if selected_user_info[12] == 'fantasy' %}selected{% endif %}>Fantasy</option>
-                                    <option value="wireframe" {% if selected_user_info[12] == 'wireframe' %}selected{% endif %}>Wireframe</option>
-                                    <option value="black" {% if selected_user_info[12] == 'black' %}selected{% endif %}>Black</option>
-                                    <option value="luxury" {% if selected_user_info[12] == 'luxury' %}selected{% endif %}>Luxury</option>
-                                    <option value="dracula" {% if selected_user_info[12] == 'dracula' %}selected{% endif %}>Dracula</option>
-                                    <option value="cmyk" {% if selected_user_info[12] == 'cmyk' %}selected{% endif %}>CMYK</option>
-                                    <option value="autumn" {% if selected_user_info[12] == 'autumn' %}selected{% endif %}>Autumn</option>
-                                    <option value="business" {% if selected_user_info[12] == 'business' %}selected{% endif %}>Business</option>
-                                    <option value="acid" {% if selected_user_info[12] == 'acid' %}selected{% endif %}>Acid</option>
-                                    <option value="lemonade" {% if selected_user_info[12] == 'lemonade' %}selected{% endif %}>Lemonade</option>
-                                    <option value="night" {% if selected_user_info[12] == 'night' %}selected{% endif %}>Night</option>
-                                    <option value="coffee" {% if selected_user_info[12] == 'coffee' %}selected{% endif %}>Coffee</option>
-                                    <option value="winter" {% if selected_user_info[12] == 'winter' %}selected{% endif %}>Winter</option>
-                                    <option value="dim" {% if selected_user_info[12] == 'dim' %}selected{% endif %}>Dim</option>
-                                    <option value="nord" {% if selected_user_info[12] == 'nord' %}selected{% endif %}>Nord</option>
-                                    <option value="sunset" {% if selected_user_info[12] == 'sunset' %}selected{% endif %}>Sunset</option>
+                                    <option value="light" {% if selected_user_info.theme == 'light' %}selected{% endif %}>Light</option>
+                                    <option value="dark" {% if selected_user_info.theme == 'dark' %}selected{% endif %}>Dark</option>
+                                    <option value="cupcake" {% if selected_user_info.theme == 'cupcake' %}selected{% endif %}>Cupcake</option>
+                                    <option value="bumblebee" {% if selected_user_info.theme == 'bumblebee' %}selected{% endif %}>Bumblebee</option>
+                                    <option value="emerald" {% if selected_user_info.theme == 'emerald' %}selected{% endif %}>Emerald</option>
+                                    <option value="corporate" {% if selected_user_info.theme == 'corporate' %}selected{% endif %}>Corporate</option>
+                                    <option value="synthwave" {% if selected_user_info.theme == 'synthwave' %}selected{% endif %}>Synthwave</option>
+                                    <option value="retro" {% if selected_user_info.theme == 'retro' %}selected{% endif %}>Retro</option>
+                                    <option value="cyberpunk" {% if selected_user_info.theme == 'cyberpunk' %}selected{% endif %}>Cyberpunk</option>
+                                    <option value="valentine" {% if selected_user_info.theme == 'valentine' %}selected{% endif %}>Valentine</option>
+                                    <option value="halloween" {% if selected_user_info.theme == 'halloween' %}selected{% endif %}>Halloween</option>
+                                    <option value="garden" {% if selected_user_info.theme == 'garden' %}selected{% endif %}>Garden</option>
+                                    <option value="forest" {% if selected_user_info.theme == 'forest' %}selected{% endif %}>Forest</option>
+                                    <option value="aqua" {% if selected_user_info.theme == 'aqua' %}selected{% endif %}>Aqua</option>
+                                    <option value="lofi" {% if selected_user_info.theme == 'lofi' %}selected{% endif %}>Lofi</option>
+                                    <option value="pastel" {% if selected_user_info.theme == 'pastel' %}selected{% endif %}>Pastel</option>
+                                    <option value="fantasy" {% if selected_user_info.theme == 'fantasy' %}selected{% endif %}>Fantasy</option>
+                                    <option value="wireframe" {% if selected_user_info.theme == 'wireframe' %}selected{% endif %}>Wireframe</option>
+                                    <option value="black" {% if selected_user_info.theme == 'black' %}selected{% endif %}>Black</option>
+                                    <option value="luxury" {% if selected_user_info.theme == 'luxury' %}selected{% endif %}>Luxury</option>
+                                    <option value="dracula" {% if selected_user_info.theme == 'dracula' %}selected{% endif %}>Dracula</option>
+                                    <option value="cmyk" {% if selected_user_info.theme == 'cmyk' %}selected{% endif %}>CMYK</option>
+                                    <option value="autumn" {% if selected_user_info.theme == 'autumn' %}selected{% endif %}>Autumn</option>
+                                    <option value="business" {% if selected_user_info.theme == 'business' %}selected{% endif %}>Business</option>
+                                    <option value="acid" {% if selected_user_info.theme == 'acid' %}selected{% endif %}>Acid</option>
+                                    <option value="lemonade" {% if selected_user_info.theme == 'lemonade' %}selected{% endif %}>Lemonade</option>
+                                    <option value="night" {% if selected_user_info.theme == 'night' %}selected{% endif %}>Night</option>
+                                    <option value="coffee" {% if selected_user_info.theme == 'coffee' %}selected{% endif %}>Coffee</option>
+                                    <option value="winter" {% if selected_user_info.theme == 'winter' %}selected{% endif %}>Winter</option>
+                                    <option value="dim" {% if selected_user_info.theme == 'dim' %}selected{% endif %}>Dim</option>
+                                    <option value="nord" {% if selected_user_info.theme == 'nord' %}selected{% endif %}>Nord</option>
+                                    <option value="sunset" {% if selected_user_info.theme == 'sunset' %}selected{% endif %}>Sunset</option>
                                 </select>
                             </div>
                         {% else %}
                             <div class="bg-base-200 p-4 rounded-lg">
                                 <div class="text-sm opacity-70 mb-1">Thème</div>
-                                <div class="font-semibold">{{ selected_user_info[12] }}</div>
+                                <div class="font-semibold">{{ selected_user_info.theme }}</div>
                             </div>
                         {% endif %}
 
@@ -221,7 +221,7 @@
                         ('edit_password', 'Modifier son mot de passe'),
                         ('edit_profile_picture', 'Modifier sa photo de profil'),
                         ('edit_A2F', 'Modifier sa 2FA'),
-                        ('edit_ergo', 'Modifier son thème')
+                        ('edit_theme', 'Modifier son thème')
                     ]),
                     ('Administration Utilisateurs', [
                         ('admin', 'Droits administrateur'),
@@ -241,6 +241,7 @@
                         ('create_user', 'Créer un utilisateur'),
                         ('delete_account', 'Supprimer un utilisateur'),
                         ('desactivate_account', 'Désactiver un utilisateur'),
+                        ('edit_permission', 'Modifier les permissions d\'un utilisateur'),
                     ]),
                     ('Modules et Maintenance', [
                         ('show_log', 'Voir les logs'),
@@ -248,17 +249,17 @@
                         ('on_off_modules', 'Activer/Désactiver modules'),
                         ('on_off_maintenance', 'Mode maintenance'),
                         ('delete_modules', 'Supprimer un module'),
-                        ('add_modules', 'Ajouter un module')
+                        ('add_modules', 'Ajouter un module'),
+                        ('edit_name_module', 'Modifier le nom d\'un module'),
+                        ('edit_url_module', 'Modifier l\'URL d\'un module'),
+                        ('edit_socket_url', 'Modifier l\'URL du socket d\'un module')
                     ]),
                     ('Configuration Système', [
-                        ('edit_name_module', 'Modifier nom du module'),
-                        ('edit_url_module', 'Modifier URL du module'),
-                        ('edit_socket_url', 'Modifier URL socket'),
                         ('edit_smtp_config', 'Modifier config SMTP')
                     ])
                 ] %}
 
-                <input type="hidden" id="userToken" value="{{ selected_user_info[1] }}">
+                <input type="hidden" id="token" value="{{ selected_user_info.token }}">
                 {% for category, perms in permissions %}
                     <div class="card bg-base-200 shadow-xl">
                         <div class="card-body p-4">
@@ -285,18 +286,17 @@
             </div>
 
         {% elif multiple_user_info %}
-            {% if user_permission[19] or user_permission[32] %}
+            {% if user_permission.create_user or user_permission.admin %}
                 <button onclick="window.location.href='{{ url_for('add_user') }}'" class="btn btn-primary">Ajouter un utilisateur</button>
             {% endif %}
             <table class="table table-zebra">
                 <thead>
                     <tr>
                         <th scope="col">ID</th>
-                        <th scope="col">Username</th>
+                        <th scope="col">Nom d'utilisateur</th>
                         <th scope="col">Email</th>
                         <th scope="col">Profile Picture</th>
                         <th scope="col">A2F</th>
-                        <th scope="col">Admin</th>
                         <th scope="col">Desactivated</th>
                         <th scope="col">Link to profile</th>
                     </tr>
@@ -304,18 +304,17 @@
                 <tbody>
                     {% for element in multiple_user_info %}
                         <tr>
-                            <th scope="row">{{ element[0] }}</th>
-                            <td>{{ element[2] }}</td>
-                            <td>{{ element[4] }}</td>
-                            <td>{{ element[7] }}</td>
-                            <td>{{ element[8] }}</td>
-                            <td>{{ element[11] }}</td>
-                            <td>{{ element[12] }}</td>
+                            <th scope="row">{{ element.id }}</th>
+                            <td>{{ element.username}}</td>
+                            <td>{{ element.email }}</td>
+                            <td>{{ element.picture }}</td>
+                            <td>{{ element.A2F }}</td>
+                            <td>{{ element.desactivated }}</td>
                             <td>
-                                {% if element[1] == request.cookies.get('token') %}
+                                {% if element.token == request.cookies.get('token') %}
                                     <button onclick="window.location.href='{{ url_for('user_space') }}'" class="btn btn-secondary">Voir le profile</button>
                                 {% else %}
-                                    <button onclick="window.location.href='{{ url_for('show_user', user_token=element[1]) }}'" class="btn btn-secondary">Voir le profile</button>
+                                    <button onclick="window.location.href='{{ url_for('show_user', user_token=element.token) }}'" class="btn btn-secondary">Voir le profile</button>
                                 {% endif %}
                             </td>
                         </tr>
@@ -329,7 +328,7 @@
 
 <script>
 function updatePermission(permissionName, value) {
-    const userToken = document.getElementById('userToken').value;
+    const userToken = document.getElementById('token').value;
 
     fetch('{{ url_for('edit_permission_user') }}', {
         method: 'POST',

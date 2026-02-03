@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="{{ local_user_theme[0] }}">
+<html lang="fr" data-theme="{{ user_data.theme }}">
 <head>
     <meta charset="UTF-8">
     <title>Cantina - Olympe</title>
@@ -20,13 +20,13 @@
             </div>
 
             <!-- Deuxième bouton (conditionnel) -->
-            {% if user_permission[20] or user_permission[32] %}
+            {% if user_permission.on_off_maintenance or user_permission.admin %}
                 <div class="w-full">
                     <form action="{{ url_for('maintenance') }}" method="post" id="maintenance_mode" class="w-full">
-                        <input type='hidden' name='module_name' value="{{ selected_module_info[2] }}"/>
-                        <input type='hidden' name='module_token' value="{{ selected_module_info[1] }}"/>
+                        <input type='hidden' name='module_name' value="{{ selected_module_info.name }}"/>
+                        <input type='hidden' name='module_token' value="{{ selected_module_info.token }}"/>
                         <button type="button" class="btn btn-error w-full" onclick="maintenance_mode()">
-                            {% if selected_module_info[4] %}
+                            {% if selected_module_info.maintenance %}
                                 Désactiver le mode maintenance
                             {% else %}
                                 Activer le mode maintenance
@@ -40,27 +40,27 @@
             <div class="card-body">
                 <div class="bg-base-200 p-4 rounded-lg">
                     <div class="text-sm opacity-70 mb-1">Identifiant</div>
-                    <div class="font-semibold">{{ selected_module_info[0] }}</div>
+                    <div class="font-semibold">{{ selected_module_info.id }}</div>
                 </div>
                 <div class="bg-base-200 p-4 rounded-lg">
                     <div class="text-sm opacity-70 mb-1">Nom</div>
-                    <div class="font-semibold">{{ selected_module_info[2] }}</div>
+                    <div class="font-semibold">{{ selected_module_info.name }}</div>
                 </div>
                 <div class="bg-base-200 p-4 rounded-lg">
                     <div class="text-sm opacity-70 mb-1">Lien</div>
-                    <div class="font-semibold"><a href="{{ selected_module_info[3] }}" class="link" target="_blank">{{ selected_module_info[3] }}</a></div>
+                    <div class="font-semibold"><a href="{{ selected_module_info.fqdn }}" class="link" target="_blank">{{ selected_module_info.fqdn }}</a></div>
                 </div>
                 <div class="bg-base-200 p-4 rounded-lg">
                     <div class="text-sm opacity-70 mb-1">Maintenance</div>
-                    <div class="font-semibold">{% if selected_module_info[4] %}Oui{% else %}Non{% endif %}</div>
+                    <div class="font-semibold">{% if selected_module_info.maintenance %}Oui{% else %}Non{% endif %}</div>
                 </div>
                 <div class="bg-base-200 p-4 rounded-lg">
                     <div class="text-sm opacity-70 mb-1">Status</div>
-                    <div class="font-semibold">{{ selected_module_info[5] }}</div>
+                    <div class="font-semibold">{{ selected_module_info.status }}</div>
                 </div>
                 <div class="bg-base-200 p-4 rounded-lg">
                     <div class="text-sm opacity-70 mb-1">URL du socket</div>
-                    <div class="font-semibold">{{ selected_module_info[3] }}{% if not selected_module_info[6].startswith('/') and not selected_module_info[3].endswith('/') %}/{% endif %}{{ selected_module_info[6] }}</div>
+                    <div class="font-semibold">{{ selected_module_info.fqdn }}{% if not selected_module_info.socket_url.startswith('/') and not selected_module_info.fqdn.endswith('/') %}/{% endif %}{{ selected_module_info.socket_url }}</div>
                 </div>
                 {% if date[1][0] > 0 or date[1][1] >= 3%}
                     <div class="bg-error p-4 rounded-lg">
@@ -82,31 +82,37 @@
         <div class="card card-side bg-base-100 shadow-xl" id="module-form" hidden>
             <div class="card-body">
                 <form method="post">
-                    <input type="hidden" name="token" value="{{ selected_module_info[1] }}">
+                    <input type="hidden" name="token" value="{{ selected_module_info.token }}">
 
                     <div class="bg-base-200 p-4 rounded-lg">
                         <div class="text-sm opacity-70 mb-1">Identifiant</div>
-                        <div class="font-semibold">{{ selected_module_info[0] }}</div>
+                        <div class="font-semibold">{{ selected_module_info.id }}</div>
                     </div>
                     <div class="bg-base-200 p-4 rounded-lg">
                         <div class="text-sm opacity-70 mb-1">Nom</div>
-                        <div class="font-semibold">{% if not user_permission[28] %}{{ selected_module_info[2] }}{% else %}<label><input type="text" name="module_name" value="{{ selected_module_info[2] }}" class="input input-accent"></label>{% endif %}</div>
+                        <div class="font-semibold">{% if not user_permission.edit_name_module or not user_permission.admin %}{{ selected_module_info.name }}{% else %}<label><input type="text" name="module_name" value="{{ selected_module_info.name }}" class="input input-accent"></label>{% endif %}</div>
                     </div>
                     <div class="bg-base-200 p-4 rounded-lg">
                         <div class="text-sm opacity-70 mb-1">Lien</div>
-                        <div class="font-semibold">{% if not user_permission[29] %}<a href="{{ selected_module_info[3] }}" target="_blank">{{ selected_module_info[2] }}</a>{% else %}<label><input type="text" name="module_url" value="{{ selected_module_info[3] }}" class="input input-accent"></label>{% endif %}</div>
+                        <div class="font-semibold">{% if not user_permission.edit_url_module or not user_permission.admin %}<a href="{{ selected_module_info.fqdn }}" target="_blank">{{ selected_module_info.fqdn }}</a>{% else %}<label><input type="text" name="module_url" value="{{ selected_module_info.fqdn }}" class="input input-accent"></label>{% endif %}</div>
                     </div>
                     <div class="bg-base-200 p-4 rounded-lg">
                         <div class="text-sm opacity-70 mb-1">Maintenance</div>
-                        <div class="font-semibold">{% if selected_module_info[4] %}Oui{% else %}Non{% endif %}</div>
+                        <div class="font-semibold">{% if selected_module_info.maintenance %}Oui{% else %}Non{% endif %}</div>
                     </div>
                     <div class="bg-base-200 p-4 rounded-lg">
                         <div class="text-sm opacity-70 mb-1">Status</div>
-                        <div class="font-semibold">{{ selected_module_info[5] }}</div>
+                        <div class="font-semibold">{{ selected_module_info.status }}</div>
                     </div>
                     <div class="bg-base-200 p-4 rounded-lg">
                         <div class="text-sm opacity-70 mb-1">URL du socket</div>
-                        <div class="font-semibold">{% if not user_permission[30] %}{{ selected_module_info[3] }}{{ selected_module_info[6] }}{% else %}<label><input type="text" name="socket_url" value="{{ selected_module_info[6] }}" class="input input-accent"></label>{% endif %}</div>
+                        <div class="font-semibold">
+                            {% if not user_permission.edit_socket_url or not user_permission.admin %}
+                                {{ selected_module_info.fqdn }}{% if not selected_module_info.socket_url.startswith('/') and not selected_module_info.fqdn.endswith('/') %}/{% endif %}{{ selected_module_info.socket_url }}
+                            {% else %}
+                                <label><input type="text" name="socket_url" value="{{ selected_module_info.socket_url }}" class="input input-accent"></label>
+                            {% endif %}
+                        </div>
                     </div>
                     {% if date[1][0] > 0 or date[1][1] >= 3%}
                         <div class="bg-error p-4 rounded-lg">

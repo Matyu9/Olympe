@@ -1,37 +1,45 @@
-from cantinaUtils.verify_login import verify_login
+from Utils.verify_login import verify_login
 from flask import redirect, url_for, request, render_template
 from datetime import datetime
+
+from Utils.Database.user import User
+from Utils.Database.permission import Permission
+from Utils.Database.modules import Module
 
 
 def show_modules_cogs(database):
     if verify_login(database) and verify_login(database) != 'desactivated':
-        user_permission = database.select('''SELECT * from cantina_administration.permission WHERE user_token = %s''',
-                                          (request.cookies.get('token')), 1)
-
         # On récupère les modules afin de pouvoir faire une redirection sur la page via la sidebar
-        modules_info = database.select("""SELECT * FROM cantina_administration.modules""", None)
+        modules_info = database.query(Module).all()
 
-        # On récupère le thème de l'utilisateur afin de pouvoir l'afficher
-        local_user_theme = database.select('''SELECT theme FROM cantina_administration.user WHERE token= %s''',
-                                           (request.cookies.get('token')), 1)
+        # On récupère les données de l'utilisateur afin de pouvoir l'afficher
+        user_data = database.query(User).filter(User.token == request.cookies.get('token')).first()
 
-        if not user_permission[23] and not user_permission[32]:  # Si l'utilisateur n'a pas la permission, redirection vers la page d'accueil
+        # On récupère les permissions de l'utilisateur afin de pouvoir afficher les options qui correspondent
+        user_permission = database.query(Permission).filter(Permission.user_token == request.cookies.get('token')).first()
+
+        if not user_permission.add_modules and not user_permission.admin:  # Si l'utilisateur n'a pas la permission, redirection vers la page d'accueil
             return redirect(url_for('home'))
 
         if request.method == 'POST':
-            database.exec('''UPDATE cantina_administration.modules SET name = %s, fqdn = %s, socket_url = %s 
-            WHERE token = %s''', (request.form["module_name"], request.form["module_url"], request.form["socket_url"],
-                                  request.form["token"]))
+            database.query(Module).filter(Module.token == request.form["token"]).update(
+                {
+                    "name": request.form["module_name"],
+                    "fqdn": request.form["module_url"],
+                    "socket_url": request.form["socket_url"]
+                }
+            )
+            database.commit()
 
             return redirect(url_for('show_modules', module_token=request.form["token"]))
         else:
             if request.args.get('module_token'):
-                selected_module_info = database.select('''SELECT * FROM cantina_administration.modules WHERE token = %s''',
-                                              (request.args.get('module_token')), 1)
+                selected_module_info = database.query(Module).filter(Module.token == request.args.get('module_token')).first()
 
-                time_diff = datetime.now() - datetime.fromtimestamp(selected_module_info[7])
 
-                date = [datetime.fromtimestamp(selected_module_info[7]).strftime("%H:%M:%S - %d/%m/%Y"),
+                time_diff = datetime.now() - datetime.fromtimestamp(selected_module_info.last_heartbeat)
+
+                date = [datetime.fromtimestamp(selected_module_info.last_heartbeat).strftime("%H:%M:%S - %d/%m/%Y"),
                         [int(time_diff.days),
                          int(time_diff.seconds // 3600),
                          int((time_diff.seconds% 3600) // 60),
@@ -41,11 +49,10 @@ def show_modules_cogs(database):
 
                 return render_template('Administration/show_one_modules.html',
                                        selected_module_info=selected_module_info, modules_info=modules_info,
-                                       user_permission=user_permission, local_user_theme=local_user_theme, date=date)
+                                       user_permission=user_permission, user_data=user_data, date=date)
             else:
-                modules_info = database.select('''SELECT * FROM cantina_administration.modules''', None)
                 return render_template('Administration/show_modules.html', modules_info=modules_info,
-                                   user_permission=user_permission, local_user_theme=local_user_theme)
+                                   user_permission=user_permission, user_data=user_data)
 
     elif verify_login(database) == 'desactivated':
         return redirect(url_for('sso_login', error='2'))

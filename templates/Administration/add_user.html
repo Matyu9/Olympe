@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="{{ local_user_theme[0] }}">
+<html lang="fr" data-theme="{{ user_data.theme }}">
 <head>
     <meta charset="UTF-8">
     <title>Cantina - Olympe</title>
@@ -63,11 +63,6 @@
                         </div>
                         <hr style="height:.5rem; visibility:hidden;" />
                         <div class="bg-base-200 p-4 rounded-lg">
-                            <div class="text-sm opacity-70 mb-1">Authetification à deux facteurs</div>
-                            <div class="font-semibold">Désactivé</div>
-                        </div>
-                        <hr style="height:.5rem; visibility:hidden;" />
-                        <div class="bg-base-200 p-4 rounded-lg">
                             <label for="theme-select" class="text-sm opacity-70 mb-1 block">Thème</label>
                             <select id="theme-select" name="theme" class="select select-bordered w-full max-w-xs">
                                 <option value="light">Light</option>
@@ -103,15 +98,6 @@
                                 <option value="nord">Nord</option>
                                 <option value="sunset">Sunset</option>
                             </select>
-                        </div>
-                        <hr style="height:.5rem; visibility:hidden;" />
-                        <div class="bg-base-200 p-4 rounded-lg">
-                            <div class="text-sm opacity-70 mb-1">Administrateur</div>
-                            <div class="font-semibold">
-                                <label>
-                                    <input type="checkbox" name="user_admin" class="toggle">
-                                </label>
-                            </div>
                         </div>
                         <hr style="height:.5rem; visibility:hidden;" />
                         <div class="card-actions justify-end">

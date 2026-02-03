@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="{{ local_user_theme[0] }}">
+<html lang="fr" data-theme="{{ user_data.theme }}">
 <head>
     <meta charset="UTF-8">
     <title>Cantina - Olympe</title>
@@ -15,29 +15,29 @@
             <div class="card-body">
                 <div class="bg-base-200 p-4 rounded-lg">
                     <div class="text-sm opacity-70 mb-1">URL du serveur SMTP :</div>
-                    <div class="font-semibold">{{ smtp_info[0][2] }}</div>
+                    <div class="font-semibold">{{ smtp_info[0].content }}</div>
                 </div>
                 <div class="bg-base-200 p-4 rounded-lg">
                     <div class="text-sm opacity-70 mb-1">Port du serveur SMTP :</div>
-                    <div class="font-semibold">{{ smtp_info[1][2] }}</div>
+                    <div class="font-semibold">{{ smtp_info[1].content }}</div>
                 </div>
                 <div class="bg-base-200 p-4 rounded-lg">
                     <div class="text-sm opacity-70 mb-1">Email d'envoie :</div>
-                    <div class="font-semibold">{{ smtp_info[2][2] }}</div>
+                    <div class="font-semibold">{{ smtp_info[2].content }}</div>
                 </div>
                 <div class="bg-base-200 p-4 rounded-lg">
                     <div class="text-sm opacity-70 mb-1">Mots de passe du serveur SMTP :</div>
-                    <div class="font-semibold">{{ smtp_info[3][2] }}</div>
+                    <div class="font-semibold">{{ smtp_info[3].content }}</div>
                 </div>
                 <div class="bg-base-200 p-4 rounded-lg">
                     <div class="text-sm opacity-70 mb-1">Sujet de mail de vérification :</div>
-                    <div class="font-semibold">{{ smtp_info[4][2] }}</div>
+                    <div class="font-semibold">{{ smtp_info[4].content }}</div>
                 </div>
                 <div class="bg-base-200 p-4 rounded-lg">
                     <div class="text-sm opacity-70 mb-1">Contenue du mail de verification :</div>
-                    <div class="font-semibold">{{ smtp_info[5][2] }}</div>
+                    <div class="font-semibold">{{ smtp_info[5].content }}</div>
                 </div>
-                {% if user_permission[31] or user_permission[32] %}
+                {% if user_permission.edit_smtp_config or user_permission.admin %}
                     <div class="card-actions justify-end">
                         <button class="btn btn-primary" onclick="showSMTPEditForm()">Modifier</button>
                     </div>
@@ -57,7 +57,7 @@
                         <div class="text-sm opacity-70 mb-1">URL du serveur SMTP :</div>
                         <div class="font-semibold">
                             <label>
-                                <input type="text" value="{{ smtp_info[0][2] }}" name="{{ smtp_info[0][1] }}" class="input">
+                                <input type="text" value="{{ smtp_info[0].content }}" name="{{ smtp_info[0].name }}" class="input">
                             </label>
                         </div>
                     </div>
@@ -65,7 +65,7 @@
                         <div class="text-sm opacity-70 mb-1">Port du serveur SMTP :</div>
                         <div class="font-semibold">
                             <label>
-                                <input type="number" value="{{ smtp_info[1][2] }}" name="{{ smtp_info[1][1] }}" class="input">
+                                <input type="number" value="{{ smtp_info[1].content }}" name="{{ smtp_info[1].name }}" class="input">
                             </label>
                         </div>
                     </div>
@@ -73,7 +73,7 @@
                         <div class="text-sm opacity-70 mb-1">Email d'envoie :</div>
                         <div class="font-semibold">
                             <label>
-                                <input type="text" value="{{ smtp_info[2][2] }}" name="{{ smtp_info[2][1] }}" class="input">
+                                <input type="text" value="{{ smtp_info[2].content }}" name="{{ smtp_info[2].name }}" class="input">
                             </label>
                         </div>
                     </div>
@@ -81,7 +81,7 @@
                         <div class="text-sm opacity-70 mb-1">Mots de passe du serveur SMTP :</div>
                         <div class="font-semibold">
                             <label>
-                                <input type="text" value="{{ smtp_info[3][2] }}" name="{{ smtp_info[3][1] }}" class="input">
+                                <input type="text" value="{{ smtp_info[3].content }}" name="{{ smtp_info[3].name }}" class="input">
                             </label>
                         </div>
                     </div>
@@ -89,7 +89,7 @@
                         <div class="text-sm opacity-70 mb-1">Sujet de mail de vérification :</div>
                         <div class="font-semibold">
                             <label>
-                                <textarea class="textarea textarea-bordered" name="{{ smtp_info[4][1] }}">{{ smtp_info[4][2] | safe }}</textarea>
+                                <textarea class="textarea textarea-bordered" name="{{ smtp_info[4].name }}">{{ smtp_info[4].content | safe }}</textarea>
                             </label>
                         </div>
                     </div>
@@ -97,11 +97,11 @@
                         <div class="text-sm opacity-70 mb-1">Contenue du mail de verification :</div>
                         <div class="font-semibold">
                             <label>
-                                <textarea class="textarea textarea-bordered" name="{{ smtp_info[5][1] }}">{{ smtp_info[5][2] }}</textarea>
+                                <textarea class="textarea textarea-bordered" name="{{ smtp_info[5].name }}">{{ smtp_info[5].content }}</textarea>
                             </label>
                         </div>
                     </div>
-                    {% if user_permission[31] or user_permission[32] %}
+                    {% if user_permission.edit_smtp_config or user_permission.admin %}
                         <div class="card-actions justify-end">
                             <button class="btn btn-primary" onclick="showSMTPEditForm()">Modifier</button>
                         </div>

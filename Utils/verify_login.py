@@ -2,29 +2,31 @@ from flask import request, redirect
 from pyotp import totp
 from werkzeug.exceptions import BadRequestKeyError
 
+from Utils.Database.user import User
+from Utils.Database.config import Config
 
 def verify_login(database):
     token = request.cookies.get('token')
     try:
-        if database.select("""SELECT desactivated FROM cantina_administration.user WHERE token = %s""", (token,), 1)[0]:
+        if database.query(User.desactivated).filter(User.token == token).scalar():
             return "desactivated"
     except TypeError:
         return False
 
-    token_validation = database.select("""SELECT id FROM cantina_administration.user WHERE token=%s""", (token,),
-                                       number_of_data=1)
+    token_validation = database.query(User.id).filter(User.token == token).scalar()
     validation = request.cookies.get('validation')
-    validation_from_db = database.select("""SELECT content FROM cantina_administration.config WHERE name=%s""",
-                                         ("secret_token",), number_of_data=1)
+    validation_from_db = database.query(Config.content).filter(Config.name == "secret_token").scalar()
 
-    return True if token_validation is not None and validation == validation_from_db[0] else False
+    return True if token_validation is not None and validation == validation_from_db else False
 
 
-def verify_A2F(database):
+def verify_A2F(A2F_secret):
     try:
-        key = totp.TOTP(database.select('''SELECT A2F_secret FROM cantina_administration.user WHERE username=%s''',
-                                        (request.form['username']), number_of_data=1)[0])
+        key = totp.TOTP(A2F_secret)
     except BadRequestKeyError:
-        key = totp.TOTP(database.select('''SELECT A2F_secret FROM cantina_administration.user WHERE token=%s''',
-                                        (request.cookies.get('token')), number_of_data=1)[0])
-    return key.verify(request.form['a2f-code'].replace(" ", ""))
+        key = totp.TOTP(A2F_secret)
+
+    try: # Utilisation classique via le formulaire
+        return key.verify(request.form['a2f-code'].replace(" ", ""))
+    except BadRequestKeyError: # Sinon utilisation de l'API
+        return key.verify(request.json['dfa_code'].replace(" ", ""))

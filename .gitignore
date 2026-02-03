@@ -2,3 +2,4 @@
 /static/ProfilePicture/
 /venv
 */.DS_Store
+.idea/
