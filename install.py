@@ -7,6 +7,20 @@ from argon2 import PasswordHasher
 from pymysql import connect
 
 
+deprecated = """
+  $$$$$$$\                                                              $$\                     $$\ 
+  $$  __$$\                                                             $$ |                    $$ |
+  $$ |  $$ | $$$$$$\   $$$$$$\   $$$$$$\   $$$$$$\   $$$$$$$\ $$$$$$\ $$$$$$\    $$$$$$\   $$$$$$$ |
+  $$ |  $$ |$$  __$$\ $$  __$$\ $$  __$$\ $$  __$$\ $$  _____|\____$$\\_$$  _|  $$  __$$\ $$  __$$ |
+  $$ |  $$ |$$$$$$$$ |$$ /  $$ |$$ |  \__|$$$$$$$$ |$$ /      $$$$$$$ | $$ |    $$$$$$$$ |$$ /  $$ |
+  $$ |  $$ |$$   ____|$$ |  $$ |$$ |      $$   ____|$$ |     $$  __$$ | $$ |$$\ $$   ____|$$ |  $$ |
+  $$$$$$$  |\$$$$$$$\ $$$$$$$  |$$ |      \$$$$$$$\ \$$$$$$$\\$$$$$$$ | \$$$$  |\$$$$$$$\ \$$$$$$$ |
+  \_______/  \_______|$$  ____/ \__|       \_______| \_______|\_______|  \____/  \_______| \_______|
+                      $$ |                                                                          
+                      $$ |                                                                          
+                      \__|                                                                          
+"""
+
 def create_user():
     token = str(uuid3(uuid1(), str(uuid1())))  # Génération d'un token unique
     hashed_password = PasswordHasher().hash(password)  # Hashage des mots de passe
@@ -48,6 +62,8 @@ based_on = None
 os_info = uname()
 database = [False, False]
 ph = PasswordHasher()
+
+exit(deprecated)
 
 if getuid() != 0:
     exit("L'installation doit être faite avec les permissions d'administrateur!")
