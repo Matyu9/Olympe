@@ -15,5 +15,3 @@ class OAuth2AuthorizationCode(Base):
     redirect_url = Column(Text)
     scope = Column(Text)
     auth_time = Column(Integer)
-
-    user = relationship("User")
