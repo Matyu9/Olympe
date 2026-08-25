@@ -1,3 +1,5 @@
+# Script d'installation historique, non maintenu (voir le banner "deprecated" plus bas).
+# Conservé pour référence uniquement — ne pas utiliser en l'état.
 from hashlib import sha256
 from json import dumps
 from os import system, getuid
@@ -8,7 +10,7 @@ from pymysql import connect
 
 
 deprecated = """
-  $$$$$$$\                                                              $$\                     $$\ 
+  $$$$$$$\                                                              $$\                     $$\
   $$  __$$\                                                             $$ |                    $$ |
   $$ |  $$ | $$$$$$\   $$$$$$\   $$$$$$\   $$$$$$\   $$$$$$$\ $$$$$$\ $$$$$$\    $$$$$$\   $$$$$$$ |
   $$ |  $$ |$$  __$$\ $$  __$$\ $$  __$$\ $$  __$$\ $$  _____|\____$$\\_$$  _|  $$  __$$\ $$  __$$ |
@@ -16,9 +18,9 @@ deprecated = """
   $$ |  $$ |$$   ____|$$ |  $$ |$$ |      $$   ____|$$ |     $$  __$$ | $$ |$$\ $$   ____|$$ |  $$ |
   $$$$$$$  |\$$$$$$$\ $$$$$$$  |$$ |      \$$$$$$$\ \$$$$$$$\\$$$$$$$ | \$$$$  |\$$$$$$$\ \$$$$$$$ |
   \_______/  \_______|$$  ____/ \__|       \_______| \_______|\_______|  \____/  \_______| \_______|
-                      $$ |                                                                          
-                      $$ |                                                                          
-                      \__|                                                                          
+                      $$ |
+                      $$ |
+                      \__|
 """
 
 def create_user():
@@ -26,16 +28,16 @@ def create_user():
     hashed_password = PasswordHasher().hash(password)  # Hashage des mots de passe
 
     # Création de l'utilisateur dans la base de données
-    cursor.execute("""INSERT INTO cantina_administration.user(token, username, password, email) 
+    cursor.execute("""INSERT INTO cantina_administration.user(token, username, password, email)
     VALUES (%s, %s, %s, %s)""", (token, username, hashed_password, ""))
 
     # Création des permissions de l'utilisateur dans la base de données
-    cursor.execute("""INSERT INTO cantina_administration.permission(user_token, show_log, edit_username, edit_email, 
-    edit_password, edit_profile_picture, edit_A2F, edit_theme, show_specific_account, edit_username_admin, 
-    edit_email_admin, edit_password_admin, edit_profile_picture_admin, allow_edit_username, allow_edit_email, 
-    allow_edit_password, allow_edit_profile_picture, allow_edit_A2F, create_user, delete_account, desactivate_account, 
-    edit_permission, show_all_modules, on_off_modules, on_off_maintenance, delete_modules, add_modules, 
-    edit_name_module, edit_url_module, edit_socket_url, edit_smtp_config, admin) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, 
+    cursor.execute("""INSERT INTO cantina_administration.permission(user_token, show_log, edit_username, edit_email,
+    edit_password, edit_profile_picture, edit_A2F, edit_theme, show_specific_account, edit_username_admin,
+    edit_email_admin, edit_password_admin, edit_profile_picture_admin, allow_edit_username, allow_edit_email,
+    allow_edit_password, allow_edit_profile_picture, allow_edit_A2F, create_user, delete_account, desactivate_account,
+    edit_permission, show_all_modules, on_off_modules, on_off_maintenance, delete_modules, add_modules,
+    edit_name_module, edit_url_module, edit_socket_url, edit_smtp_config, admin) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s,
     %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s)""",
                    (token, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
 
@@ -137,29 +139,29 @@ if not database[0]:
 
 cursor.execute("USE cantina_administration")
 
-cursor.execute("""CREATE TABLE IF NOT EXISTS cantina_administration.user(id INT PRIMARY KEY AUTO_INCREMENT, 
-token TEXT NOT NULL,  username TEXT NOT NULL, password TEXT NOT NULL, email TEXT NOT NULL, 
-email_verified BOOL DEFAULT FALSE, email_verification_code TEXT, picture BOOL DEFAULT false, 
-A2F BOOL DEFAULT FALSE, A2F_secret TEXT, last_connection DATE, 
+cursor.execute("""CREATE TABLE IF NOT EXISTS cantina_administration.user(id INT PRIMARY KEY AUTO_INCREMENT,
+token TEXT NOT NULL,  username TEXT NOT NULL, password TEXT NOT NULL, email TEXT NOT NULL,
+email_verified BOOL DEFAULT FALSE, email_verification_code TEXT, picture BOOL DEFAULT false,
+A2F BOOL DEFAULT FALSE, A2F_secret TEXT, last_connection DATE,
 desactivated BOOL DEFAULT FALSE, theme TEXT DEFAULT 'light', super_admin BOOL DEFAULT FALSE)""", None)
-cursor.execute("""CREATE TABLE IF NOT EXISTS cantina_administration.config(id INT PRIMARY KEY AUTO_INCREMENT, 
+cursor.execute("""CREATE TABLE IF NOT EXISTS cantina_administration.config(id INT PRIMARY KEY AUTO_INCREMENT,
 name TEXT, content TEXT)""", None)
-cursor.execute("""CREATE TABLE IF NOT EXISTS cantina_administration.modules(id INT PRIMARY KEY AUTO_INCREMENT, 
-token TEXT, name TEXT, fqdn TEXT, maintenance BOOL default FALSE, status INTEGER DEFAULT 0, 
+cursor.execute("""CREATE TABLE IF NOT EXISTS cantina_administration.modules(id INT PRIMARY KEY AUTO_INCREMENT,
+token TEXT, name TEXT, fqdn TEXT, maintenance BOOL default FALSE, status INTEGER DEFAULT 0,
 socket_url TEXT DEFAULT '/socket/', last_heartbeat INT)""", None)
 cursor.execute("""CREATE TABLE IF NOT EXISTS cantina_administration.permission(id INT PRIMARY KEY AUTO_INCREMENT,
-user_token TEXT NOT NULL, show_log BOOL DEFAULT FALSE, edit_username BOOL DEFAULT FALSE, edit_email BOOL DEFAULT FALSE, 
-edit_password BOOL DEFAULT FALSE, edit_profile_picture BOOL DEFAULT FALSE, edit_A2F BOOL DEFAULT FALSE, 
+user_token TEXT NOT NULL, show_log BOOL DEFAULT FALSE, edit_username BOOL DEFAULT FALSE, edit_email BOOL DEFAULT FALSE,
+edit_password BOOL DEFAULT FALSE, edit_profile_picture BOOL DEFAULT FALSE, edit_A2F BOOL DEFAULT FALSE,
 edit_theme BOOL DEFAULT FALSE, show_specific_account BOOL DEFAULT FALSE, edit_username_admin BOOL DEFAULT FALSE,
-edit_email_admin BOOL DEFAULT FALSE, edit_password_admin BOOL DEFAULT FALSE, 
-edit_profile_picture_admin BOOl DEFAULT FALSE, allow_edit_username BOOL DEFAULT FALSE, 
+edit_email_admin BOOL DEFAULT FALSE, edit_password_admin BOOL DEFAULT FALSE,
+edit_profile_picture_admin BOOl DEFAULT FALSE, allow_edit_username BOOL DEFAULT FALSE,
 allow_edit_email BOOL DEFAULT FALSE, allow_edit_password BOOL DEFAULT FALSE,
-allow_edit_profile_picture BOOL DEFAULT FALSE, allow_edit_A2F BOOL DEFAULT FALSE, create_user BOOL DEFAULT FALSE, 
-delete_account BOOL DEFAULT FALSE, desactivate_account BOOL DEFAULT FALSE, edit_permission BOOL DEFAULT FALSE, 
-show_all_modules BOOL DEFAULT FALSE, on_off_modules BOOL DEFAULT FALSE, on_off_maintenance BOOL DEFAULT FALSE, 
-delete_modules BOOL DEFAULT FALSE, add_modules BOOL DEFAULT FALSE, edit_name_module BOOL DEFAULT FALSE, 
+allow_edit_profile_picture BOOL DEFAULT FALSE, allow_edit_A2F BOOL DEFAULT FALSE, create_user BOOL DEFAULT FALSE,
+delete_account BOOL DEFAULT FALSE, desactivate_account BOOL DEFAULT FALSE, edit_permission BOOL DEFAULT FALSE,
+show_all_modules BOOL DEFAULT FALSE, on_off_modules BOOL DEFAULT FALSE, on_off_maintenance BOOL DEFAULT FALSE,
+delete_modules BOOL DEFAULT FALSE, add_modules BOOL DEFAULT FALSE, edit_name_module BOOL DEFAULT FALSE,
 edit_url_module BOOL DEFAULT FALSE, edit_socket_url BOOL DEFAULT FALSE, edit_smtp_config BOOL DEFAULT FALSE, admin BOOL DEFAULT FALSE)""", None)
-cursor.execute("""CREATE TABLE IF NOT EXISTS cantina_administration.log(id INT PRIMARY KEY AUTO_INCREMENT, 
+cursor.execute("""CREATE TABLE IF NOT EXISTS cantina_administration.log(id INT PRIMARY KEY AUTO_INCREMENT,
     action_name TEXT, user_ip TEXT, user_token TEXT, details TEXT, log_level INT)""", None)
 print("Nous allons donc créer un premier compte administrateur.")
 

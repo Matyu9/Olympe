@@ -2,10 +2,12 @@ from flask import Flask, g
 from flask_socketio import SocketIO
 from os import path, getcwd
 from json import load
+from secrets import token_hex
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from Utils.Database.base import Base, get_db
+from Utils.Database.config import Config
 
 from Utils.verify_maintenance import verify_maintenance
 
@@ -56,6 +58,12 @@ engine_sql = create_engine(
 Base.metadata.create_all(engine_sql)
 
 Session_SQL = sessionmaker(bind=engine_sql)
+
+# Génération du secret partagé utilisé par les modules Cantina pour valider une session Olympe (cf. cantinaUtils)
+with Session_SQL() as _startup_db:
+    if _startup_db.query(Config).filter(Config.name == "secret_token").scalar() is None:
+        _startup_db.add(Config(name="secret_token", content=token_hex(32)))
+        _startup_db.commit()
 
 
 # Vérifiacation du mode de maintenance
@@ -164,8 +172,7 @@ def smtp_test():
 
 @app.route('/sso/login/', methods=['GET', 'POST'])
 def sso_login(error=0):
-    return sso_login_cogs(get_db(Session_SQL), error, config_data['modules'][0]['global_domain'],
-                          config_data['modules'][0]["secret_key"])
+    return sso_login_cogs(get_db(Session_SQL), error, config_data['modules'][0]['global_domain'])
 
 @app.route('/sso/logout/', methods=['GET'])
 def sso_logout():

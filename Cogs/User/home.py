@@ -1,3 +1,4 @@
+from datetime import datetime
 from Utils.verify_login import verify_login
 from flask import redirect, url_for, request, render_template
 
@@ -5,6 +6,15 @@ from sqlalchemy import func
 from Utils.Database.user import User
 from Utils.Database.permission import Permission
 from Utils.Database.modules import Module
+
+
+def _greeting():
+    hour = datetime.now().hour
+    if 5 <= hour < 12:
+        return "Bonjour"
+    if 12 <= hour < 18:
+        return "Bon après-midi"
+    return "Bonsoir"
 
 
 def user_home_cogs(database):
@@ -24,9 +34,11 @@ def user_home_cogs(database):
         modules_info = database.query(Module).all()
         nb_user = database.query(func.count(User.id)).scalar()
         nb_module = database.query(func.count(Module.id)).scalar()
+        nb_module_online = sum(1 for module in modules_info if module.status and not module.maintenance)
 
         return render_template('User/index.html', user_information=user_information,
-                               user_permission=user_permission, modules_info=modules_info, nb_user=nb_user, nb_module=nb_module)
+                               user_permission=user_permission, modules_info=modules_info, nb_user=nb_user,
+                               nb_module=nb_module, nb_module_online=nb_module_online, greeting=_greeting())
 
     else:
         return None

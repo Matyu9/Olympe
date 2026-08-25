@@ -10,36 +10,96 @@
 </head>
 <body>
     {% include "PlaceHolder/sidebar.html" %}
-    <main class="p-4 md:ml-64 h-auto pt-20 min-h-screen">
-        <div role="alert" class="alert alert-info">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="h-6 w-6 shrink-0 stroke-current">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <span>Plus d'infos viendront s'ajouter à cette page, au fur et à mesure de l'avancement du projet.</span>
+    <main class="p-4 md:ml-64 h-auto pt-20 min-h-screen space-y-6">
+
+        <!-- Bandeau de bienvenue -->
+        <div class="hero bg-gradient-to-r from-primary to-secondary rounded-2xl shadow-xl overflow-hidden">
+            <div class="hero-content flex-col md:flex-row justify-between w-full py-8 px-8 gap-6">
+                <div class="text-primary-content">
+                    <h1 class="text-3xl font-bold">{{ greeting }}, {{ user_information.username }}</h1>
+                    <p class="opacity-80 mt-1">Bienvenue sur le tableau de bord d'administration de Cantina - Olympe.</p>
+                </div>
+                <div class="avatar">
+                    <div class="w-16 h-16 md:w-20 md:h-20 rounded-full ring ring-primary-content/50 ring-offset-base-100 ring-offset-2">
+                        <img src="{{ url_for('get_profile_picture') }}" alt="Photo de profil" class="object-cover">
+                    </div>
+                </div>
+            </div>
         </div>
-        <br>
-        <div class="stats stats-vertical lg:stats-horizontal shadow grid gap-4">
+
+        <!-- Statistiques -->
+        <div class="stats stats-vertical lg:stats-horizontal shadow w-full">
             <div class="stat place-items-center">
-                <div class="stat-title">Nombre de modules</div>
+                <div class="stat-figure text-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"></path>
+                    </svg>
+                </div>
+                <div class="stat-title">Modules</div>
                 <div class="stat-value text-primary">{{ nb_module }}</div>
+                <div class="stat-desc">{{ nb_module_online }} en ligne</div>
             </div>
 
             <div class="stat place-items-center">
-                <div class="stat-title">Nombre d'utilisateurs</div>
+                <div class="stat-figure text-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"></path>
+                    </svg>
+                </div>
+                <div class="stat-title">Utilisateurs</div>
                 <div class="stat-value text-secondary">{{ nb_user }}</div>
             </div>
 
             <div class="stat place-items-center">
-                <div class="stat-title">Nombre de connexion par jours</div>
-                <div class="stat-value text-primary">0</div>
-                <div class="stat-desc">Analytics en cours de création</div>
-            </div>
-
-            <div class="stat place-items-center">
-                <div class="stat-title">Stat 4</div>
-                <div class="stat-value text-primary">J'ai pas d'idée</div>
+                <div class="stat-figure text-success">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 4.556-3.04 8.44-7.29 9.71a1.5 1.5 0 0 1-1.42 0C7.04 20.44 4 16.556 4 12V6.75a1.5 1.5 0 0 1 1.5-1.5c1.657 0 3.208-.44 4.5-1.25a1.5 1.5 0 0 1 1.5 0c1.292.81 2.843 1.25 4.5 1.25a1.5 1.5 0 0 1 1.5 1.5V12Z"></path>
+                    </svg>
+                </div>
+                <div class="stat-title">Ton compte</div>
+                <div class="stat-value text-success text-2xl">{% if user_permission.admin %}Admin{% else %}Actif{% endif %}</div>
+                <div class="stat-desc">{{ user_information.email }}</div>
             </div>
         </div>
+
+        <!-- Modules -->
+        <div>
+            <h2 class="text-xl font-semibold mb-3">Vos modules</h2>
+            {% if modules_info %}
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {% for module in modules_info %}
+                        <div class="card bg-base-100 shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200">
+                            <div class="card-body p-5">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="card-title text-base">{{ module.name }}</h3>
+                                    {% if module.maintenance %}
+                                        <span class="badge badge-warning gap-1">Maintenance</span>
+                                    {% elif module.status %}
+                                        <span class="badge badge-success gap-1">En ligne</span>
+                                    {% else %}
+                                        <span class="badge badge-error gap-1">Hors ligne</span>
+                                    {% endif %}
+                                </div>
+                                <p class="text-sm opacity-60 truncate">{{ module.fqdn }}</p>
+                                <div class="card-actions justify-end mt-2">
+                                    <button class="btn btn-sm btn-primary" {% if module.maintenance %}disabled{% endif %}
+                                        onclick="window.open('{{ module.fqdn }}', '_blank')">
+                                        Ouvrir
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="card bg-base-100 shadow-md">
+                    <div class="card-body items-center text-center py-10">
+                        <p class="opacity-70">Aucun module n'est encore enregistré.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
     </main>
 </body>
 </html>
