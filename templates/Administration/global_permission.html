@@ -34,7 +34,7 @@
                     <div class="font-semibold">{% if permission[4] == "1" %} Oui {% else %} Non {% endif %}</div>
                 </div>
                 <div class="card-actions justify-end">
-                    <button class="btn btn-primary" onclick="showGlobalPermissionForm()">Modifier les modifications du comptes</button>
+                    <button class="btn btn-primary" onclick="showGlobalPermissionForm()">Modifier</button>
                 </div>
             </div>
         </div>
@@ -125,7 +125,7 @@
 
                     {% if user_permission.allow_edit_username or user_permission.allow_edit_email or user_permission.allow_edit_password or user_permission.allow_edit_profile_picture or user_permission.allow_edit_A2F or user_permission.admin %}
                         <div class="card-actions justify-end">
-                            <button class="btn btn-primary" onclick="showGlobalPermissionForm()">Modifier les modifications du comptes</button>
+                            <button class="btn btn-primary" onclick="showGlobalPermissionForm()">Enregistrer les modifications</button>
                         </div>
                     {% endif %}
                 </form>

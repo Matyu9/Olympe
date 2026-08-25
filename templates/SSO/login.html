@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Cantina - Login</title>
+    <title>Cantina - Connexion</title>
     <link rel="icon" href="{{ url_for('static', filename='SVG/logo.svg') }}" sizes="any" type="image/svg+xml">
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
@@ -10,9 +10,9 @@
 <body>
     <div class="flex justify-center">
         {% if request.args.get('error') == '1' %}
-            <p>L'identifiant ou le mots de passe est incorrecte !</p>
+            <p>Identifiant ou mot de passe incorrect.</p>
         {% elif request.args.get('error') == '2' %}
-            <p>Votre compte a été désactivé ! Merci de contacter votre Administrateur pour continuer.</p>
+            <p>Votre compte a été désactivé. Merci de contacter un administrateur.</p>
         {% endif %}
         <div class="card w-96 bg-base-100 shadow-xl mt-20 mb-20">
             <div class="card-body">
@@ -34,7 +34,7 @@
                         </label>
                     </div>
                     <div class="card-actions justify-end">
-                        <button class="btn btn-primary w-full">Login</button>
+                        <button class="btn btn-primary w-full">Se connecter</button>
                     </div>
                 </form>
             </div>

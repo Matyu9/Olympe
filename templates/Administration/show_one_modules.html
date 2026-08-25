@@ -15,7 +15,7 @@
             <!-- Premier bouton -->
             <div class="w-full">
                 <button onclick="window.location.href='{{ url_for('show_modules') }}'" class="btn btn-secondary w-full">
-                    Tout les modules
+                    Tous les modules
                 </button>
             </div>
 
@@ -73,7 +73,7 @@
                 {% if date[1][0] > 0 or date[1][1] >= 3%}
                     <div class="bg-error p-4 rounded-lg">
                         <div class="text-sm opacity-70 mb-1">Dernière connexion</div>
-                        <div class="font-semibold">Attention, le module n'a pas envoyé de confirmation au serveur depuis un certain temps ! Contacter les administrateurs du site !</div>
+                        <div class="font-semibold">Le module n'a pas envoyé de confirmation au serveur depuis un certain temps. Contactez un administrateur.</div>
                         <div class="font-semibold">{{ date[0] }} - Il y a {% if date[1][0] >= 0 %}{{ date[1][0] }} jours, {% endif %}{% if date[1][1] >= 0 %}{{ date[1][1] }} heures, {% endif %}{{ date[1][2] }} minutes et {{ date[1][3] }} secondes.</div>
                     </div>
                 {% else %}
@@ -90,7 +90,7 @@
                             <button type="submit" class="btn btn-warning">Régénérer le secret client</button>
                         </form>
                     {% endif %}
-                    <button class="btn btn-primary" onclick="showModuleEditForm()">Modifier les modifications du comptes</button>
+                    <button class="btn btn-primary" onclick="showModuleEditForm()">Modifier</button>
                 </div>
             </div>
         </div>
@@ -143,7 +143,7 @@
                     {% if date[1][0] > 0 or date[1][1] >= 3%}
                         <div class="bg-error p-4 rounded-lg">
                             <div class="text-sm opacity-70 mb-1">Dernière connexion</div>
-                            <div class="font-semibold">Attention, le module n'a pas envoyé de confirmation au serveur depuis un certain temps ! Contacter les administrateurs du site !</div>
+                            <div class="font-semibold">Le module n'a pas envoyé de confirmation au serveur depuis un certain temps. Contactez un administrateur.</div>
                             <div class="font-semibold">{{ date[0] }} - Il y a {% if date[1][0] >= 0 %}{{ date[1][0] }} jours, {% endif %}{% if date[1][1] >= 0 %}{{ date[1][1] }} heures, {% endif %}{{ date[1][2] }} minutes et {{ date[1][3] }} secondes.</div>
                         </div>
                     {% else %}
@@ -153,7 +153,7 @@
                         </div>
                     {% endif %}
                     <div class="card-actions justify-end">
-                        <button class="btn btn-primary" onclick="showModuleEditForm()">Modifier les modifications du module</button>
+                        <button class="btn btn-primary" onclick="showModuleEditForm()">Enregistrer les modifications</button>
                     </div>
                 </form>
             </div>
@@ -162,7 +162,7 @@
 
     <script>
         function maintenance_mode(){
-            if (confirm('Êtes vous sûr de vouloir activer le mode maintenance sur ce module ?')) {
+            if (confirm('Êtes-vous sûr de vouloir activer le mode maintenance sur ce module ?')) {
                 let form = document.getElementById('maintenance_mode');
                 let input = document.createElement("input");
                 input.type = "hidden";

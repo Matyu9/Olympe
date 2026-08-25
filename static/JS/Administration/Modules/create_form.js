@@ -16,7 +16,7 @@ function create_form() {
         fr.readAsText(files.item(0));
         console.log(config)
     } else if (files.length === 0 && modules_name.value === "Autre") {
-        alert('Problem in file maybe file isn\'t uploaded to webpage')
+        alert('Veuillez sélectionner un fichier.')
     } else if (modules_name.value !== "autre") {
         fetch(`https://matyu.fr/cantina/Olympe/${modules_name.value.toLowerCase()}-install-file.json`, {
             method: 'GET',
