@@ -1,4 +1,6 @@
 from uuid import uuid3, uuid1
+from secrets import token_urlsafe
+from argon2 import PasswordHasher
 from Utils.verify_login import verify_login
 from flask import redirect, url_for, request, render_template
 
@@ -22,24 +24,30 @@ def add_modules_cogs(database):
             # return render_template('Administration/disabled_feature.html')
             return render_template('Administration/modules/add_modules.html', user_permission=user_permission, user_data=user_data)
         elif request.method == 'POST':
-            token = str(uuid3(uuid1(), str(uuid1())))  # Génération d'un token unique
+            token = str(uuid3(uuid1(), str(uuid1())))  # Génération d'un token unique (= client_id OIDC)
             try:
                 _maintenance = 1 if request.form["module_maintenance"] else 0
             except Exception as e:
                 print(e)
                 _maintenance = 0
+            require_consent = bool(request.form.get("module_require_consent"))
 
-            database.add(
-                Module(
-                    token=token,
-                    name=request.form["module_name"],
-                    fqdn=request.form["module_fqdn"],
-                    maintenance = bool(_maintenance)
-                )
+            plain_secret = token_urlsafe(32)  # Secret client OIDC, affiché en clair une seule fois
+
+            module = Module(
+                token=token,
+                name=request.form["module_name"],
+                fqdn=request.form["module_fqdn"],
+                maintenance=bool(_maintenance),
+                require_consent=require_consent,
+                client_secret=PasswordHasher().hash(plain_secret),
             )
+            database.add(module)
             database.commit()
 
-            return redirect(url_for('show_modules', module_token=token))
+            return render_template('Administration/modules/client_secret_shown.html',
+                                   module=module, plain_secret=plain_secret,
+                                   user_permission=user_permission, user_data=user_data)
 
     elif verify_login(database) == 'desactivated':
         return redirect(url_for('sso_login', error='2'))

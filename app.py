@@ -1,6 +1,6 @@
 from flask import Flask, g
 from flask_socketio import SocketIO
-from os import path, getcwd
+from os import path, getcwd, environ
 from json import load
 from secrets import token_hex
 
@@ -8,8 +8,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from Utils.Database.base import Base, get_db
 from Utils.Database.config import Config
+# Import nécessaire pour que Base.metadata connaisse ces tables (sinon create_all ne les crée pas)
+from Utils.Database.OAuth2AuthorizationCode import OAuth2AuthorizationCode
+from Utils.Database.OAuth2Token import OAuth2Token
 
 from Utils.verify_maintenance import verify_maintenance
+from Utils.OAuth.server import init_oauth_server
 
 from Cogs.SSO.login import sso_login_cogs
 from Cogs.SSO.logout import sso_logout_cogs
@@ -34,6 +38,11 @@ from Cogs.API.User.user_info_cogs import api_user_info_cogs
 
 from Cogs.Socket.heart_beat_cogs import heart_beat_cogs
 from Cogs.Socket.ping_server_socket_cogs import ping_server_socket_cogs
+
+from Cogs.OAuth.authorize_cogs import oauth_authorize_cogs
+from Cogs.OAuth.token_cogs import oauth_token_cogs
+from Cogs.OAuth.userinfo_cogs import oauth_userinfo_cogs
+from Cogs.OAuth.discovery_cogs import oidc_discovery_cogs, oidc_jwks_cogs
 
 file_path = path.abspath(path.join(getcwd(), "config.json"))  # Trouver le chemin complet du fichier config.json
 
@@ -64,6 +73,16 @@ with Session_SQL() as _startup_db:
     if _startup_db.query(Config).filter(Config.name == "secret_token").scalar() is None:
         _startup_db.add(Config(name="secret_token", content=token_hex(32)))
         _startup_db.commit()
+
+# Mise en place du serveur OIDC (endpoints /oauth/*)
+if config_data["modules"][0]["debug_mode"]:
+    # Autorise le protocole OIDC en HTTP pour le développement local uniquement
+    environ["AUTHLIB_INSECURE_TRANSPORT"] = "1"
+app.config["OAUTH2_REFRESH_TOKEN_GENERATOR"] = True
+# expires_in du access_token, quel que soit le grant qui l'a émis (le refresh_token, lui, n'expire
+# pas tant qu'il n'est pas révoqué : pas de champ d'expiration dédié dans OAuth2Token pour l'instant)
+app.config["OAUTH2_TOKEN_EXPIRES_IN"] = {"authorization_code": 3600, "refresh_token": 3600}
+init_oauth_server(app, Session_SQL)
 
 
 # Vérifiacation du mode de maintenance
@@ -155,6 +174,12 @@ def maintenance():
     return maintenance_cogs(get_db(Session_SQL))
 
 
+@app.route('/admin/modules/regenerate_secret/', methods=['POST'])
+def regenerate_secret():
+    from Cogs.Administration.Modules.regenerate_secret import regenerate_secret_cogs
+    return regenerate_secret_cogs(get_db(Session_SQL))
+
+
 @app.route('/admin/smtp/config/', methods=['POST', 'GET'])
 def smtp_config():
     return smtp_config_cogs(get_db(Session_SQL))
@@ -177,6 +202,36 @@ def sso_login(error=0):
 @app.route('/sso/logout/', methods=['GET'])
 def sso_logout():
     return sso_logout_cogs()
+
+"""
+    Partie OIDC
+"""
+
+
+@app.route('/oauth/authorize', methods=['GET', 'POST'])
+def oauth_authorize():
+    return oauth_authorize_cogs(get_db(Session_SQL))
+
+
+@app.route('/oauth/token', methods=['POST'])
+def oauth_token():
+    return oauth_token_cogs()
+
+
+@app.route('/oauth/userinfo', methods=['GET', 'POST'])
+def oauth_userinfo():
+    return oauth_userinfo_cogs(get_db(Session_SQL))
+
+
+@app.route('/.well-known/openid-configuration', methods=['GET'])
+def openid_configuration():
+    return oidc_discovery_cogs()
+
+
+@app.route('/oauth/jwks.json', methods=['GET'])
+def oauth_jwks():
+    return oidc_jwks_cogs(get_db(Session_SQL))
+
 
 """
     Partie Socket

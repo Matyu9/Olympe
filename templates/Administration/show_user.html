@@ -273,7 +273,7 @@
                                             <input
                                                 type="checkbox"
                                                 class="toggle toggle-primary"
-                                                {% if perm_code == 'admin' %}disabled{% endif %}
+                                                {% if perm_code == 'admin' and (not user_permission.admin or selected_user_info.token == request.cookies.get('token')) %}disabled{% endif %}
                                                 {% if selected_user_permission[perm_code] %}checked{% endif %}
                                                 onchange="updatePermission('{{ perm_code }}', this.checked)"
                                             />

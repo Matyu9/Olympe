@@ -9,6 +9,14 @@ from Utils.Database.config import Config
 from Utils.Database.modules import Module
 
 
+def _safe_next_url():
+    # Anti open-redirect : seule une reprise vers le flow OIDC est autorisée
+    next_url = request.args.get('next')
+    if next_url and next_url.startswith('/oauth/authorize?'):
+        return next_url
+    return None
+
+
 def sso_login_cogs(database, error, global_domain):
     if request.method == 'POST':  # Si l'utilisateur à remplir le formulaire
         username = request.form['username']  # Sauvegarde du nom d'utilisateur
@@ -34,7 +42,10 @@ def sso_login_cogs(database, error, global_domain):
                 return render_template('SSO/2FA-Verif.html', password=password, username=username)
 
             elif not row.A2F or verify_A2F(row.A2F_secret):  # Si l'A2F n'est pas activé ou que le code est correcte
-                if domain_to_redirect is None:
+                next_url = _safe_next_url()
+                if next_url is not None:
+                    response = make_response(redirect(next_url, code=302))
+                elif domain_to_redirect is None:
                     url = url_for('home')
                     response = make_response(redirect(url, code=302))
                 else:
@@ -53,6 +64,10 @@ def sso_login_cogs(database, error, global_domain):
     elif request.method == 'GET':  # Si l'utilisateur consulte la page
         # Si l'utilisateur est déjà connecté et que son compte n'est pas désactivé, redirection auto
         if verify_login(database) and verify_login(database) != 'desactivated':
+            next_url = _safe_next_url()
+            if next_url is not None:
+                return redirect(next_url, code=302)
+
             domain_to_redirect = database.query(Module.fqdn).filter(Module.name == request.args.get('modules')).first()
 
             if domain_to_redirect is None:

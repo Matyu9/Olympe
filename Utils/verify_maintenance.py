@@ -3,7 +3,11 @@ from Utils.verify_login import verify_login
 from Utils.Database.permission import Permission
 
 def verify_maintenance(database, maintenance):
-    if not request.path.startswith('/static/') and not request.path.startswith('/sso/') and not request.path.startswith('/user_space/get_profile_picture'):
+    # /oauth/ et /.well-known/ gèrent leur propre auth (session pour /oauth/authorize avec reprise via
+    # ?next=, client_secret ou Bearer token pour les appels serveur-à-serveur des modules) : le hook
+    # générique ne doit pas s'interposer.
+    exempt_prefixes = ('/static/', '/sso/', '/user_space/get_profile_picture', '/oauth/', '/.well-known/')
+    if not request.path.startswith(exempt_prefixes):
         if not verify_login(database):
             return redirect(url_for('sso_login', error='0'))
         else:

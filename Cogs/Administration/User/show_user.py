@@ -29,8 +29,14 @@ def show_user_cogs(database, upload_path):
 
             # Si l'utilisateur souhaite voir un utilisateur en particulier
             if request.args.get('user_token'):
+                # On ne gère pas son propre compte depuis la vue admin : direction l'espace personnel
+                if request.args.get('user_token') == request.cookies.get('token'):
+                    return redirect(url_for('user_space'))
+
                 # Sélectionne les données et permissions de l'utilisateur souhaité
                 selected_user_data = database.query(User).filter(User.token == request.args.get('user_token')).first()
+                if selected_user_data is None:  # Le token demandé ne correspond à aucun utilisateur
+                    return redirect(url_for('show_user'))
                 selected_user_permission = database.query(Permission).filter(Permission.user_token == request.args.get('user_token')).first()
 
                 return render_template('Administration/show_user.html',
@@ -56,6 +62,8 @@ def show_user_cogs(database, upload_path):
         elif request.method == 'POST':
             # On sélectionne toutes les infos de l'utilisateur
             selected_user_data = database.query(User).filter(User.token == request.form["token"]).first()
+            if selected_user_data is None:  # Le token soumis ne correspond à aucun utilisateur
+                return redirect(url_for('show_user'))
             try:
                 # On vérifie si l'username a changé
                 if request.form['username'] != selected_user_data.username:

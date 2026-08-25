@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Cantina - Autorisation</title>
+    <link rel="icon" href="{{ url_for('static', filename='SVG/logo.svg') }}" sizes="any" type="image/svg+xml">
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div class="flex justify-center">
+        <div class="card w-96 bg-base-100 shadow-xl mt-20 mb-20">
+            <div class="card-body">
+                <h2 class="card-title">Autoriser {{ client.name }} ?</h2>
+                <p class="text-sm opacity-70 mt-1">
+                    Connecté en tant que <span class="font-semibold">{{ user.username }}</span>.
+                </p>
+                <p class="text-sm opacity-70 mt-2">Cette application va pouvoir accéder à :</p>
+                <ul class="list-disc list-inside text-sm mt-1 space-y-1">
+                    <li>Votre identifiant unique</li>
+                    {% if 'profile' in scope %}<li>Votre nom d'utilisateur</li>{% endif %}
+                    {% if 'email' in scope %}<li>Votre adresse email</li>{% endif %}
+                </ul>
+                <form method="post" action="#" class="mt-4">
+                    <div class="card-actions justify-end gap-2">
+                        <button type="submit" name="confirm" value="no" class="btn btn-ghost">Refuser</button>
+                        <button type="submit" name="confirm" value="yes" class="btn btn-primary">Autoriser</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

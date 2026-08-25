@@ -26,7 +26,8 @@ def show_modules_cogs(database):
                 {
                     "name": request.form["module_name"],
                     "fqdn": request.form["module_url"],
-                    "socket_url": request.form["socket_url"]
+                    "socket_url": request.form["socket_url"],
+                    "require_consent": bool(request.form.get("module_require_consent"))
                 }
             )
             database.commit()

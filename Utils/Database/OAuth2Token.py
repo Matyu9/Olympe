@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, Text, Boolean, ForeignKey
+from time import time
+from sqlalchemy import Column, Integer, Text, Boolean
 from Utils.Database.base import Base
 
 
@@ -14,5 +15,24 @@ class OAuth2Token(Base):
     issued_at = Column(Integer)
     expires_in = Column(Integer)
 
-    client_id = Column(Text, foreign_key='modules.token', ondelete='CASCADE')
-    user_id = Column(Text, foreign_key='user.token', ondelete='CASCADE')
+    # Référence "molle" vers Module.token / User.token, comme partout ailleurs dans ce schéma
+    # (Permission.user_token, etc.) — pas de contrainte FK SQL, ces colonnes n'étant pas indexées.
+    client_id = Column(Text)
+    user_id = Column(Text)
+
+    # --- Méthodes attendues par Authlib (ResourceProtector / RefreshTokenGrant) ---
+
+    def get_scope(self):
+        return self.scope or ""
+
+    def get_expires_at(self):
+        return self.issued_at + self.expires_in
+
+    def is_expired(self):
+        return self.get_expires_at() < time()
+
+    def is_revoked(self):
+        return bool(self.revoked)
+
+    def check_client(self, client):
+        return self.client_id == client.get_client_id()
