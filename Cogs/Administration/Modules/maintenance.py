@@ -1,11 +1,9 @@
 from Utils.verify_login import verify_login
-from flask import redirect, url_for, request
+from flask import redirect, url_for, request, current_app
 from json import dump
 
 from Utils.Database.permission import Permission
 from Utils.Database.modules import Module
-
-import app
 
 
 def maintenance_cogs(database):
@@ -17,15 +15,16 @@ def maintenance_cogs(database):
             return redirect(url_for('home'))
 
         if request.method == 'POST':
-            if request.form["module_name"] == app.config_data['modules'][0]['name']: # Si c'est Olympe qui est en maintenance,
-                app.config_data['modules'][0]['maintenance'] = not app.config_data['modules'][0]['maintenance'] # On enregistre dans le fichier json du module
+            config_data = current_app.config['CONFIG_DATA']
+            if request.form["module_name"] == config_data['modules'][0]['name']: # Si c'est Olympe qui est en maintenance,
+                config_data['modules'][0]['maintenance'] = not config_data['modules'][0]['maintenance'] # On enregistre dans le fichier json du module
 
-                with open(app.file_path, 'w') as file:
-                    dump(app.config_data, file, indent=4)
+                with open(current_app.config['CONFIG_FILE_PATH'], 'w') as file:
+                    dump(config_data, file, indent=4)
 
                 database.query(Module).filter(Module.token == request.form["module_token"]).update(
                     {
-                        "maintenance": not app.config_data['modules'][0]['maintenance']
+                        "maintenance": not config_data['modules'][0]['maintenance']
                     }
                 )
 
