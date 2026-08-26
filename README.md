@@ -75,6 +75,73 @@ Ouvrez votre navigateur et rendez-vous sur :
 
 ---
 
+## 🧪 Tests
+
+Les tests (`Test/`) envoient de vraies requêtes HTTP au serveur Olympe : il faut donc que le serveur tourne déjà avant de les lancer (pas de serveur dédié aux tests).
+
+### 1. Environnement virtuel
+
+Si ce n'est pas déjà fait (voir section Installation ci-dessus) :
+
+```bash
+python -m venv venv
+```
+
+Activation — Windows (PowerShell) :
+```powershell
+venv\Scripts\Activate.ps1
+```
+
+Activation — macOS/Linux :
+```bash
+source venv/bin/activate
+```
+
+### 2. Dépendances de test
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+Ce fichier installe `requirements.txt` (les dépendances de l'app) plus `pytest` et `requests`, utilisés uniquement pour les tests.
+
+### 3. Lancer le serveur
+
+Dans un premier terminal, venv activé, avec un `config.json` valide déjà en place (voir section Configuration) :
+
+```bash
+python app.py
+```
+
+Laissez ce terminal ouvert pendant toute la durée des tests.
+
+### 4. Lancer les tests
+
+Dans un second terminal, venv activé, depuis la racine du projet :
+
+```bash
+pytest
+```
+
+Pour plus de détail sur chaque test :
+
+```bash
+pytest -v
+```
+
+### Bon à savoir
+
+* **Comptes de test** : chaque test qui a besoin d'un utilisateur crée un compte jetable directement en base (préfixé `_pytest_`, mot de passe fixe défini dans `Test/conftest.py`) et le supprime automatiquement à la fin — même si le test échoue.
+* **Serveur non lancé** : si `python app.py` n'a pas été démarré, `pytest` échoue immédiatement avec un message explicite plutôt qu'un timeout confus.
+* **Échec connu, sans rapport** : `Test/Socket/unit/test_socket.py::test_hearbeat` échoue actuellement car il référence un `Module` (token codé en dur) qui n'existe pas en base — indépendant de la suite HTTP mise en place ci-dessus.
+
+### Ajouter un test
+
+* Un fichier par fonctionnalité, sous `Test/<Domaine>/test_*.py` (ex : `Test/SSO/test_login.py`).
+* Les fixtures partagées (`base_url`, `make_user`, `login_as`, ...) sont définies dans `Test/conftest.py`.
+
+---
+
 ## 🤝 Contribuer
 
 Olympe se veut simple et accessible. La stack technique est basée sur **Python** et **Flask**.
