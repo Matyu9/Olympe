@@ -9,3 +9,4 @@ Authlib~=1.6.0
 cantinaUtils==0.0.6
 qrcode==7.4.2
 pypng==0.20220715.0
+paramiko~=3.5.0

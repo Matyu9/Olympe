@@ -20,6 +20,11 @@
                         Ajouter un module
                     </button>
                 </div>
+                <div class="w-full">
+                    <button type="button" class="btn btn-warning w-full" onclick="window.location.href='{{ url_for('show_install_form') }}'">
+                        Installer un module (JSON)
+                    </button>
+                </div>
             {% endif %}
         </div>
         <table class="table table-zebra">

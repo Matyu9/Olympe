@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="{{ user_data.theme }}">
+<head>
+    <meta charset="UTF-8">
+    <title>Cantina - Olympe</title>
+    <link rel="icon" href="{{ url_for('static', filename='SVG/logo.svg') }}" sizes="any" type="image/svg+xml">
+    <script type="application/javascript" src="{{ url_for('static', filename='JS/Administration/Modules/install_form.js') }}"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    {% include "PlaceHolder/sidebar.html" %}
+    <main class="p-4 md:ml-64 h-auto pt-20 min-h-screen">
+        {% if errors %}
+            <div role="alert" class="alert alert-error mb-4">
+                <ul class="list-disc list-inside">
+                    {% for error in errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <form action="{{ url_for('start_install') }}" method="post" id="install-form">
+            <input type="hidden" name="manifest_json" id="manifest-json">
+
+            <div class="card bg-base-100 shadow-xl mb-4">
+                <div class="card-body space-y-3">
+                    <h2 class="card-title">Manifeste du module</h2>
+                    <div class="bg-base-200 p-4 rounded-lg">
+                        <div class="text-sm opacity-70 mb-1">Fichier manifeste (JSON)</div>
+                        <input type="file" id="manifest-file" accept="application/json" class="file-input file-input-bordered w-full max-w-xs">
+                    </div>
+                    <div id="manifest-preview" class="space-y-3 hidden">
+                        <div class="bg-base-200 p-4 rounded-lg">
+                            <div class="text-sm opacity-70 mb-1">Nom</div>
+                            <div class="font-semibold" id="manifest-name"></div>
+                        </div>
+                        <div class="bg-base-200 p-4 rounded-lg">
+                            <div class="text-sm opacity-70 mb-1">Dépôt</div>
+                            <div class="font-mono text-sm break-all" id="manifest-repo"></div>
+                        </div>
+                        <div class="bg-base-200 p-4 rounded-lg">
+                            <div class="text-sm opacity-70 mb-1">Guidelines</div>
+                            <div class="font-semibold" id="manifest-guidelines"></div>
+                        </div>
+                        <div class="bg-base-200 p-4 rounded-lg">
+                            <div class="text-sm opacity-70 mb-1">Beta</div>
+                            <div class="font-semibold" id="manifest-beta"></div>
+                        </div>
+                        <div class="bg-base-200 p-4 rounded-lg">
+                            <div class="text-sm opacity-70 mb-1">Script d'installation</div>
+                            <div class="font-mono text-sm" id="manifest-install-script"></div>
+                        </div>
+                        <div id="html-input-fields" class="space-y-3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-base-100 shadow-xl mb-4">
+                <div class="card-body space-y-3">
+                    <h2 class="card-title">Paramètres de déploiement</h2>
+                    <div class="bg-base-200 p-4 rounded-lg">
+                        <div class="text-sm opacity-70 mb-1">Cible d'installation</div>
+                        <div class="flex gap-4">
+                            <label class="label cursor-pointer gap-2">
+                                <input type="radio" name="install_target" value="local" id="target-local" class="radio" checked>
+                                <span>Ce serveur (local, pas de SSH)</span>
+                            </label>
+                            <label class="label cursor-pointer gap-2">
+                                <input type="radio" name="install_target" value="remote" id="target-remote" class="radio">
+                                <span>Serveur distant (SSH)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="ssh-fields" class="space-y-3 hidden">
+                        <div class="bg-base-200 p-4 rounded-lg">
+                            <div class="text-sm opacity-70 mb-1">Hôte SSH</div>
+                            <input type="text" name="ssh_url" class="input w-full max-w-xs">
+                        </div>
+                        <div class="bg-base-200 p-4 rounded-lg">
+                            <div class="text-sm opacity-70 mb-1">Port SSH</div>
+                            <input type="text" name="ssh_port" value="22" class="input w-full max-w-xs">
+                        </div>
+                        <div class="bg-base-200 p-4 rounded-lg">
+                            <div class="text-sm opacity-70 mb-1">Utilisateur SSH</div>
+                            <input type="text" name="ssh_username" class="input w-full max-w-xs">
+                        </div>
+                        <div class="bg-base-200 p-4 rounded-lg">
+                            <div class="text-sm opacity-70 mb-1">Mot de passe SSH</div>
+                            <input type="password" name="ssh_password" class="input w-full max-w-xs">
+                        </div>
+                    </div>
+
+                    <div class="bg-base-200 p-4 rounded-lg">
+                        <div class="text-sm opacity-70 mb-1">Chemin de clonage cible</div>
+                        <input type="text" name="path_to_clone" required class="input w-full max-w-xs">
+                    </div>
+                    <div class="bg-base-200 p-4 rounded-lg">
+                        <div class="text-sm opacity-70 mb-1">URL publique du module</div>
+                        <input type="url" name="module_fqdn" required class="input w-full max-w-xs">
+                    </div>
+                    <div class="bg-base-200 p-4 rounded-lg">
+                        <div class="text-sm opacity-70 mb-1">Sauvegarder les identifiants SSH (chiffrés)</div>
+                        <input type="checkbox" name="save_credentials" class="toggle">
+                    </div>
+
+                    <div class="card-actions justify-end">
+                        <button type="submit" class="btn btn-primary">Lancer l'installation</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </main>
+</body>
+</html>

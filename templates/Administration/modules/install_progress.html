@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="{{ user_data.theme }}">
+<head>
+    <meta charset="UTF-8">
+    <title>Cantina - Olympe</title>
+    <link rel="icon" href="{{ url_for('static', filename='SVG/logo.svg') }}" sizes="any" type="image/svg+xml">
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script type="application/javascript" src="{{ url_for('static', filename='JS/Administration/Modules/install_progress.js') }}"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    {% include "PlaceHolder/sidebar.html" %}
+    <main class="p-4 md:ml-64 h-auto pt-20 min-h-screen"
+          id="install-progress-main"
+          data-installation-id="{{ installation.id }}"
+          data-status="{{ installation.status }}">
+        <div class="card bg-base-100 shadow-xl mb-4">
+            <div class="card-body space-y-3">
+                <h2 class="card-title">Installation de {{ installation.name }}</h2>
+                <div class="bg-base-200 p-4 rounded-lg">
+                    <div class="text-sm opacity-70 mb-1">Statut</div>
+                    <div class="font-semibold" id="status-badge">{{ installation.status }}</div>
+                </div>
+                <div class="bg-base-200 p-4 rounded-lg">
+                    <div class="text-sm opacity-70 mb-1">Journal</div>
+                    <ul id="progress-log" class="font-mono text-sm space-y-1 max-h-96 overflow-y-auto"></ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="done-panel" class="card bg-base-100 shadow-xl mb-4 hidden">
+            <div class="card-body space-y-3">
+                <div role="alert" class="alert alert-warning mb-4">
+                    <span>Ce secret ne sera plus jamais affiché en clair. Copie-le maintenant et conserve-le côté module.</span>
+                </div>
+                <div class="bg-base-200 p-4 rounded-lg">
+                    <div class="text-sm opacity-70 mb-1">client_id</div>
+                    <div class="font-mono text-sm break-all" id="done-client-id"></div>
+                </div>
+                <div class="bg-base-200 p-4 rounded-lg">
+                    <div class="text-sm opacity-70 mb-1">client_secret</div>
+                    <div class="font-mono text-sm break-all" id="done-client-secret"></div>
+                </div>
+                <div class="card-actions justify-end">
+                    <a href="{{ url_for('show_modules') }}" class="btn btn-primary">Voir les modules</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="error-panel" role="alert" class="alert alert-error mb-4 hidden">
+            <span id="error-message"></span>
+        </div>
+    </main>
+</body>
+</html>

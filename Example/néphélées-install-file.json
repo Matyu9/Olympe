@@ -14,49 +14,6 @@
         "default-value": "true"
       }
     },
-    "database": {
-      "connection": {
-        "url": "",
-        "port": 3306,
-        "username": "",
-        "password": ""
-      },
-      "table": [{
-        "name": "table1",
-        "row": [{
-          "name": "row1-1",
-          "type": "TEXT"
-        }, {
-          "name": "row1-2",
-          "type": "BOOL"
-        }, {
-          "name": "row1-3",
-          "type": "INTEGER"
-        }]
-      }, {
-        "name": "table2",
-        "row": [{
-          "name": "row2-1",
-          "type": "TEXT"
-        }, {
-          "name": "row2-2",
-          "type": "BOOL"
-        }, {
-          "name": "row2-3",
-          "type": "INTEGER"
-        }]
-      }]
-    },
-    "global": {
-      "url": "",
-      "installation": {
-        "ssh-url": "",
-        "ssh-port": "",
-        "ssh-username": "",
-        "ssh-password": "",
-        "path-to-clone": "",
-        "auto-restart": true
-      }
-    }
+    "install-script": "install.sh"
   }
 }

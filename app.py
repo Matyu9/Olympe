@@ -1,5 +1,5 @@
 from flask import Flask, g
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, join_room
 from os import path, getcwd, environ
 from json import load
 from secrets import token_hex
@@ -11,6 +11,7 @@ from Utils.Database.config import Config
 # Import nécessaire pour que Base.metadata connaisse ces tables (sinon create_all ne les crée pas)
 from Utils.Database.OAuth2AuthorizationCode import OAuth2AuthorizationCode
 from Utils.Database.OAuth2Token import OAuth2Token
+from Utils.Database.module_installation import ModuleInstallation
 
 from Utils.verify_maintenance import verify_maintenance
 from Utils.OAuth.server import init_oauth_server
@@ -34,6 +35,9 @@ from Cogs.Administration.Modules.show_modules import show_modules_cogs
 from Cogs.Administration.Modules.add_modules import add_modules_cogs
 from Cogs.Administration.Modules.maintenance import maintenance_cogs
 from Cogs.Administration.Modules.regenerate_secret import regenerate_secret_cogs
+from Cogs.Administration.Modules.show_install_form import show_install_form_cogs
+from Cogs.Administration.Modules.start_install import start_install_cogs
+from Cogs.Administration.Modules.show_install_progress import show_install_progress_cogs
 
 from Cogs.API.SSO.login_cogs import api_login_cogs
 from Cogs.API.User.user_info_cogs import api_user_info_cogs
@@ -172,6 +176,18 @@ def create_app(config_path=None):
     def regenerate_secret():
         return regenerate_secret_cogs(get_db(Session_SQL))
 
+    @app.route('/admin/modules/install/', methods=['GET'])
+    def show_install_form():
+        return show_install_form_cogs(get_db(Session_SQL))
+
+    @app.route('/admin/modules/install/start/', methods=['POST'])
+    def start_install():
+        return start_install_cogs(get_db(Session_SQL), socketio, Session_SQL)
+
+    @app.route('/admin/modules/install/<int:installation_id>/', methods=['GET'])
+    def show_install_progress(installation_id):
+        return show_install_progress_cogs(get_db(Session_SQL), installation_id)
+
     @app.route('/admin/smtp/config/', methods=['POST', 'GET'])
     def smtp_config():
         return smtp_config_cogs(get_db(Session_SQL))
@@ -223,6 +239,10 @@ def create_app(config_path=None):
     @socketio.on('heartbeat')
     def heart_beat(data):
         return heart_beat_cogs(data, get_db(Session_SQL))
+
+    @socketio.on('join_install_room')
+    def join_install(data):
+        join_room(str(data['installation_id']))
 
     @socketio.on('ping_server')
     def ping_server_socket():
