@@ -7,6 +7,7 @@ from werkzeug.exceptions import BadRequestKeyError
 from Utils.Database.user import User
 from Utils.Database.config import Config
 from Utils.Database.modules import Module
+from Utils.Administration.Modules.module_access import user_can_access_module
 
 
 def _safe_next_url():
@@ -30,7 +31,7 @@ def sso_login_cogs(database, error, global_domain):
         # Séléction des données requises pour valider la connexion.
         row = database.query(User).filter(User.username == username).first()
         validation_code = database.query(Config.content).filter(Config.name == "secret_token").scalar()
-        domain_to_redirect = database.query(Module.fqdn).filter(Module.name == request.args.get('modules')).first()
+        domain_to_redirect = database.query(Module).filter(Module.name == request.args.get('modules')).first()
 
         if row is None:  # Si aucune correspondance, redirect vers la page de login avec le message d'erreur n°1
             return redirect(url_for('sso_login', error='1'))
@@ -48,8 +49,11 @@ def sso_login_cogs(database, error, global_domain):
                 elif domain_to_redirect is None:
                     url = url_for('home')
                     response = make_response(redirect(url, code=302))
+                elif not user_can_access_module(database, row, domain_to_redirect):
+                    url = url_for('home', module_access_denied='1', module_name=domain_to_redirect.name)
+                    response = make_response(redirect(url, code=302))
                 else:
-                    response = make_response(redirect(domain_to_redirect, code=302))
+                    response = make_response(redirect(domain_to_redirect.fqdn, code=302))
 
                 # Création des cookies de vérification d'authentification
                 response.set_cookie('token', row.token, domain='.'+str(global_domain))
@@ -68,12 +72,15 @@ def sso_login_cogs(database, error, global_domain):
             if next_url is not None:
                 return redirect(next_url, code=302)
 
-            domain_to_redirect = database.query(Module.fqdn).filter(Module.name == request.args.get('modules')).first()
+            domain_to_redirect = database.query(Module).filter(Module.name == request.args.get('modules')).first()
 
             if domain_to_redirect is None:
                 return redirect(url_for('home'))
             else:
-                return redirect(domain_to_redirect, code=302)
+                current_user = database.query(User).filter(User.token == request.cookies.get('token')).first()
+                if not user_can_access_module(database, current_user, domain_to_redirect):
+                    return redirect(url_for('home', module_access_denied='1', module_name=domain_to_redirect.name))
+                return redirect(domain_to_redirect.fqdn, code=302)
 
         print(verify_login(database))
 

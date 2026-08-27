@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="{{ url_for('static', filename='SVG/logo.svg') }}" sizes="any" type="image/svg+xml">
+    <title>Cantina - Accès refusé</title>
+</head>
+<body>
+    <h1>Cantina</h1>
+    <p>
+        Vous n'êtes pas autorisé à vous connecter au module <strong>{{ module.name }}</strong>.
+        Contactez un administrateur si vous pensez qu'il s'agit d'une erreur.
+        <br><a href="{{ url_for('home') }}">Retour à l'accueil</a>
+    </p>
+
+</body>
+</html>

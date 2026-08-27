@@ -3,6 +3,7 @@ from flask import request, render_template, redirect, url_for
 from Utils.verify_login import verify_login
 from Utils.Database.user import User
 from Utils.OAuth.server import authorization_server
+from Utils.Administration.Modules.module_access import user_can_access_module
 
 
 def oauth_authorize_cogs(database):
@@ -17,6 +18,9 @@ def oauth_authorize_cogs(database):
     user = database.query(User).filter(User.token == request.cookies.get('token')).first()
     grant = authorization_server.get_consent_grant(end_user=user)
     client = grant.client
+
+    if not user_can_access_module(database, user, client):
+        return render_template('SSO/module_access_denied.html', module=client, user_data=user), 403
 
     if request.method == 'GET':
         if client.require_consent:

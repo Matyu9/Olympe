@@ -18,8 +18,10 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from Utils.Database.user import User
 from Utils.Database.permission import Permission
+from Utils.Database.modules import Module
 from Utils.Database.group import Group
 from Utils.Database.group_member import GroupMember
+from Utils.Database.module_access import ModuleAccess
 
 TEST_USERNAME_PREFIX = "_pytest_"
 TEST_PASSWORD = "Pytest-Test-Password-1!"
@@ -117,9 +119,39 @@ def _cleanup_stale_test_users(db_session):
 
 
 @pytest.fixture()
+def make_module(db_session):
+    """Factory de module de test : make_module(restricted_access=True).
+    Chaque module créé (+ ses ModuleAccess éventuels) est nettoyé à la fin du test."""
+    created_tokens = []
+
+    def _make_module(restricted_access=False):
+        token = f"{TEST_USERNAME_PREFIX}{uuid4()}"
+        module = Module(
+            token=token,
+            name=f"{token}_module",
+            fqdn=f"https://{token}.example.invalid",
+            restricted_access=restricted_access,
+        )
+        db_session.add(module)
+        db_session.commit()
+
+        created_tokens.append(token)
+        return module
+
+    yield _make_module
+
+    for token in created_tokens:
+        module = db_session.query(Module).filter(Module.token == token).first()
+        if module is not None:
+            db_session.query(ModuleAccess).filter(ModuleAccess.module_id == module.id).delete()
+            db_session.query(Module).filter(Module.token == token).delete()
+    db_session.commit()
+
+
+@pytest.fixture()
 def make_group(db_session):
     """Factory de groupe de test : make_group() -> Group.
-    Chaque groupe créé (+ ses membres) est nettoyé à la fin du test."""
+    Chaque groupe créé (+ ses membres et accès module) est nettoyé à la fin du test."""
     created_ids = []
 
     def _make_group():
@@ -134,6 +166,7 @@ def make_group(db_session):
 
     for group_id in created_ids:
         db_session.query(GroupMember).filter(GroupMember.group_id == group_id).delete()
+        db_session.query(ModuleAccess).filter(ModuleAccess.group_id == group_id).delete()
         db_session.query(Group).filter(Group.id == group_id).delete()
     db_session.commit()
 

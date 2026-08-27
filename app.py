@@ -14,6 +14,7 @@ from Utils.Database.OAuth2Token import OAuth2Token
 from Utils.Database.module_installation import ModuleInstallation
 from Utils.Database.group import Group
 from Utils.Database.group_member import GroupMember
+from Utils.Database.module_access import ModuleAccess
 
 from Utils.verify_maintenance import verify_maintenance
 from Utils.OAuth.server import init_oauth_server
@@ -40,6 +41,9 @@ from Cogs.Administration.Modules.regenerate_secret import regenerate_secret_cogs
 from Cogs.Administration.Modules.show_install_form import show_install_form_cogs
 from Cogs.Administration.Modules.start_install import start_install_cogs
 from Cogs.Administration.Modules.show_install_progress import show_install_progress_cogs
+from Cogs.Administration.Modules.module_access import (
+    toggle_restricted_access_cogs, grant_module_access_cogs, revoke_module_access_cogs
+)
 from Cogs.Administration.Groups.show_groups import show_groups_cogs
 from Cogs.Administration.Groups.add_group import add_group_cogs
 from Cogs.Administration.Groups.edit_group_members import add_group_member_cogs, remove_group_member_cogs
@@ -180,6 +184,18 @@ def create_app(config_path=None):
     @app.route('/admin/modules/regenerate_secret/', methods=['POST'])
     def regenerate_secret():
         return regenerate_secret_cogs(get_db(Session_SQL))
+
+    @app.route('/admin/modules/access/toggle_restricted/', methods=['POST'])
+    def toggle_restricted_access():
+        return toggle_restricted_access_cogs(get_db(Session_SQL))
+
+    @app.route('/admin/modules/access/grant/', methods=['POST'])
+    def grant_module_access():
+        return grant_module_access_cogs(get_db(Session_SQL))
+
+    @app.route('/admin/modules/access/revoke/', methods=['POST'])
+    def revoke_module_access():
+        return revoke_module_access_cogs(get_db(Session_SQL))
 
     @app.route('/admin/groups/', methods=['GET'])
     def show_groups():

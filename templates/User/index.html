@@ -12,6 +12,12 @@
     {% include "PlaceHolder/sidebar.html" %}
     <main class="p-4 md:ml-64 h-auto pt-20 min-h-screen space-y-6">
 
+        {% if request.args.get('module_access_denied') %}
+            <div role="alert" class="alert alert-error">
+                <span>Vous n'êtes pas autorisé à vous connecter au module {{ request.args.get('module_name') }}.</span>
+            </div>
+        {% endif %}
+
         <!-- Bandeau de bienvenue -->
         <div class="hero bg-gradient-to-r from-primary to-secondary rounded-2xl shadow-xl overflow-hidden">
             <div class="hero-content flex-col md:flex-row justify-between w-full py-8 px-8 gap-6">

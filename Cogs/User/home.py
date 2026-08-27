@@ -6,6 +6,7 @@ from sqlalchemy import func
 from Utils.Database.user import User
 from Utils.Database.permission import Permission
 from Utils.Database.modules import Module
+from Utils.Administration.Modules.module_access import visible_modules_for_user
 
 
 def _greeting():
@@ -31,9 +32,9 @@ def user_home_cogs(database):
     if request.method == 'GET':
         # Récupération des permissions de l'utilisateur
         user_permission = database.query(Permission).filter(Permission.user_token == request.cookies.get('token')).first()
-        modules_info = database.query(Module).all()
+        modules_info = visible_modules_for_user(database, user_information)
         nb_user = database.query(func.count(User.id)).scalar()
-        nb_module = database.query(func.count(Module.id)).scalar()
+        nb_module = len(modules_info)
         nb_module_online = sum(1 for module in modules_info if module.status and not module.maintenance)
 
         return render_template('User/index.html', user_information=user_information,

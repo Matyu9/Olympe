@@ -5,6 +5,7 @@
     <title>Cantina - Olympe</title>
     <link rel="icon" href="{{ url_for('static', filename='SVG/logo.svg') }}" sizes="any" type="image/svg+xml">
     <script type="application/javascript" src="{{ url_for('static', filename='JS/Administration/show_form_module_edit.js') }}"></script>
+    <script type="application/javascript" src="{{ url_for('static', filename='JS/Administration/user_picker.js') }}"></script>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -158,6 +159,66 @@
                 </form>
             </div>
         </div>
+        {% if user_permission.on_off_modules or user_permission.admin %}
+            <div class="card bg-base-100 shadow-xl" id="module-access">
+                <div class="card-body">
+                    <h2 class="card-title">Accès restreint</h2>
+                    <label class="flex items-center justify-between p-2">
+                        <span class="label-text">Restreindre l'authentification sur ce module</span>
+                        <input type="checkbox" class="toggle toggle-primary" id="restricted-access-toggle"
+                               {% if selected_module_info.restricted_access %}checked{% endif %}
+                               onchange="toggleRestrictedAccess(this.checked)">
+                    </label>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div>
+                            <h3 class="font-semibold mb-2">Utilisateurs autorisés</h3>
+                            <ul class="space-y-1" id="module-user-access-list">
+                                {% for access in module_user_access %}
+                                    <li class="flex items-center justify-between bg-base-200 p-2 rounded-lg">
+                                        <span>{{ access.username }}</span>
+                                        <button class="btn btn-xs btn-error" onclick="revokeModuleAccess({{ access.access_id }})">Retirer</button>
+                                    </li>
+                                {% else %}
+                                    <li class="opacity-60 text-sm">Aucun utilisateur autorisé directement.</li>
+                                {% endfor %}
+                            </ul>
+                            <div class="flex gap-2 mt-2">
+                                <div class="relative flex-1">
+                                    <input type="text" id="add-user-access-input" placeholder="Rechercher un utilisateur…" class="input input-sm input-bordered w-full" autocomplete="off">
+                                    <ul id="add-user-access-results" class="hidden absolute z-10 top-full mt-1 left-0 w-full max-h-48 overflow-y-auto bg-base-100 border border-base-300 rounded-lg shadow-lg"></ul>
+                                </div>
+                                <button class="btn btn-sm btn-primary" onclick="grantModuleAccess('user')">Ajouter</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="font-semibold mb-2">Groupes autorisés</h3>
+                            <ul class="space-y-1" id="module-group-access-list">
+                                {% for access in module_group_access %}
+                                    <li class="flex items-center justify-between bg-base-200 p-2 rounded-lg">
+                                        <span>{{ access.group_name }}</span>
+                                        <button class="btn btn-xs btn-error" onclick="revokeModuleAccess({{ access.access_id }})">Retirer</button>
+                                    </li>
+                                {% else %}
+                                    <li class="opacity-60 text-sm">Aucun groupe autorisé.</li>
+                                {% endfor %}
+                            </ul>
+                            <div class="flex gap-2 mt-2">
+                                <select id="add-group-access-select" class="select select-sm select-bordered w-full">
+                                    {% for group in all_groups %}
+                                        <option value="{{ group.id }}">{{ group.name }}</option>
+                                    {% else %}
+                                        <option value="" disabled>Aucun groupe disponible</option>
+                                    {% endfor %}
+                                </select>
+                                <button class="btn btn-sm btn-primary" onclick="grantModuleAccess('group')">Ajouter</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
     </main>
 
     <script>
@@ -171,6 +232,65 @@
             } else {
                 console.log('Annulation de la requête.');
             }
+        }
+
+        const MODULE_TOKEN = '{{ selected_module_info.token }}';
+
+        {% if user_permission.on_off_modules or user_permission.admin %}
+            setupUserPicker('add-user-access-input', 'add-user-access-results', {{ all_usernames | tojson }});
+        {% endif %}
+
+        function toggleRestrictedAccess(checked) {
+            fetch('{{ url_for("toggle_restricted_access") }}', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({module_token: MODULE_TOKEN})
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        document.getElementById('restricted-access-toggle').checked = !checked;
+                    }
+                });
+        }
+
+        function grantModuleAccess(subjectType) {
+            let subjectValue;
+            if (subjectType === 'user') {
+                subjectValue = document.getElementById('add-user-access-input').value.trim();
+                if (!subjectValue) return;
+            } else {
+                subjectValue = document.getElementById('add-group-access-select').value;
+                if (!subjectValue) return;
+            }
+
+            fetch('{{ url_for("grant_module_access") }}', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({module_token: MODULE_TOKEN, subject_type: subjectType, subject_value: subjectValue})
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
+                        alert(data.error || "Impossible d'ajouter cet accès.");
+                    }
+                });
+        }
+
+        function revokeModuleAccess(accessId) {
+            fetch('{{ url_for("revoke_module_access") }}', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({access_id: accessId})
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    }
+                });
         }
     </script>
 </body>

@@ -5,16 +5,17 @@ from flask import redirect, url_for, request, render_template
 from Utils.Database.user import User
 from Utils.Database.permission import Permission
 from Utils.Database.modules import Module
+from Utils.Administration.Modules.module_access import visible_modules_for_user
 
 
 def add_user_cogs(database):
     # Vérification de si l'utilisateur est bien connecté et n'a pas un compte désactivé
     if verify_login(database) and verify_login(database) != 'desactivated':
-        # On récupère les modules afin de pouvoir faire une redirection sur la page via la sidebar
-        modules_info = database.query(Module).all()
-
         # On récupère les données de l'utilisateur afin de pouvoir l'afficher
         user_data = database.query(User).filter(User.token == request.cookies.get('token')).first()
+
+        # On récupère les modules afin de pouvoir faire une redirection sur la page via la sidebar
+        modules_info = visible_modules_for_user(database, user_data)
 
         # On récupère les permissions de l'utilisateur afin de pouvoir afficher les options qui correspondent
         user_permission = database.query(Permission).filter(Permission.user_token == request.cookies.get('token')).first()

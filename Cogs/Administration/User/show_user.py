@@ -10,17 +10,18 @@ from Utils.Database.permission import Permission
 from Utils.Database.modules import Module
 from Utils.Database.group import Group
 from Utils.Database.group_member import GroupMember
+from Utils.Administration.Modules.module_access import visible_modules_for_user
 
 
 def show_user_cogs(database, upload_path):
     # Vérification de si l'utilisateur est bien connecté et n'a pas un compte désactivé
     if verify_login(database) and verify_login(database) != "desactivated":
         if request.method == 'GET':  # S'il fait une requete de type GET
-            # On récupère les modules afin de pouvoir faire une redirection sur la page via la sidebar
-            modules_info = database.query(Module).all()
-
             # On récupère les données de l'utilisateur afin de pouvoir l'afficher
             user_data = database.query(User).filter(User.token == request.cookies.get('token')).first()
+
+            # On récupère les modules afin de pouvoir faire une redirection sur la page via la sidebar
+            modules_info = visible_modules_for_user(database, user_data)
 
             # On récupère les permissions de l'utilisateur afin de pouvoir afficher les options qui correspondent
             user_permission = database.query(Permission).filter(Permission.user_token == request.cookies.get('token')).first()

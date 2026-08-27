@@ -20,6 +20,7 @@ class Module(Base):
     status = Column(Integer, default=0)
     socket_url = Column(Text, default='/socket/')
     last_heartbeat = Column(Integer, default=0)
+    restricted_access = Column(Boolean, default=False)
 
     @property
     def client_id(self):

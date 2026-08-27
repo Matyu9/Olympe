@@ -11,6 +11,7 @@ from Utils.Database.permission import Permission
 from Utils.Database.config import Config
 from Utils.Database.group import Group
 from Utils.Database.group_member import GroupMember
+from Utils.Administration.Modules.module_access import visible_modules_for_user
 
 
 def user_space_cogs(database, upload_path):
@@ -28,7 +29,7 @@ def user_space_cogs(database, upload_path):
         # Récupération des permissions de l'utilisateur
         user_permission = database.query(Permission).filter(Permission.user_token == request.cookies.get('token')).first()
         # On récupère les modules afin de pouvoir faire une redirection sur la page via la sidebar
-        modules_info = database.query(Module).all()
+        modules_info = visible_modules_for_user(database, user_information)
         # On récupère les permissions générales
         general_permission = {config.name: int(config.content)   for config in database.query(Config).filter(Config.name.startswith('edit_')).all()} # in {"edit_username":1, "edit_password":1, "edit_email":1, "edit_profile_picture":1, "edit_a2f":1}
 

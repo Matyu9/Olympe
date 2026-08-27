@@ -5,6 +5,7 @@ from Utils.verify_login import verify_A2F, verify_login
 from Utils.Database.user import User
 from Utils.Database.permission import Permission
 from Utils.Database.modules import Module
+from Utils.Administration.Modules.module_access import visible_modules_for_user
 
 
 def doubleFA_add_cogs(database):
@@ -18,11 +19,11 @@ def doubleFA_add_cogs(database):
     # On récupère les permissions de l'utilisateur
     user_permission = database.query(Permission).filter(Permission.user_token == request.cookies.get('token')).first()
 
-    # On récupère les modules afin de pouvoir faire une redirection sur la page via la sidebar
-    modules_info = database.query(Module).all()
-
     # On récupère les données l'utilisateur afin de pouvoir l'afficher
     user_data = database.query(User).filter(User.token == request.cookies.get('token')).first()
+
+    # On récupère les modules afin de pouvoir faire une redirection sur la page via la sidebar
+    modules_info = visible_modules_for_user(database, user_data)
 
     if request.method == 'POST':  # Si l'utilisateur valide le formulaire
         if verify_A2F(user_data.A2F_secret):  # Vérification réussie du code via la base de donnée

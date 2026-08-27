@@ -87,7 +87,7 @@ def test_start_install_rejects_invalid_manifest(base_url, make_user, login_as):
     })
 
     assert response.status_code == 200
-    assert "parameter missing" in response.text
+    assert "Paramètre manquant" in response.text
 
 
 def test_start_install_rejects_when_missing_permission(base_url, make_user, login_as):
