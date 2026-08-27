@@ -18,15 +18,15 @@
                     <div class="font-semibold">{% if permission[0] == "1" %} Oui {% else %} Non {% endif %}</div>
                 </div>
                 <div class="bg-base-200 p-4 rounded-lg">
-                    <div class="text-sm opacity-70 mb-1">Modification des mots de passes : </div>
+                    <div class="text-sm opacity-70 mb-1">Modification des mots de passe : </div>
                     <div class="font-semibold">{% if permission[1] == "1" %} Oui {% else %} Non {% endif %}</div>
                 </div>
                 <div class="bg-base-200 p-4 rounded-lg">
-                    <div class="text-sm opacity-70 mb-1">Modification des addresses emails :</div>
+                    <div class="text-sm opacity-70 mb-1">Modification des adresses e-mail :</div>
                     <div class="font-semibold">{% if permission[2] == "1" %} Oui {% else %} Non {% endif %}</div>
                 </div>
                 <div class="bg-base-200 p-4 rounded-lg">
-                    <div class="text-sm opacity-70 mb-1">Modification des photos de profile :</div>
+                    <div class="text-sm opacity-70 mb-1">Modification des photos de profil :</div>
                     <div class="font-semibold">{% if permission[3] == "1" %} Oui {% else %} Non {% endif %}</div>
                 </div>
                 <div class="bg-base-200 p-4 rounded-lg">
@@ -61,7 +61,7 @@
 
                     {% if user_permission.allow_edit_password or user_permission.admin %}
                         <div class="bg-base-200 p-4 rounded-lg">
-                            <div class="text-sm opacity-70 mb-1">Modification des mots de passes :</div>
+                            <div class="text-sm opacity-70 mb-1">Modification des mots de passe :</div>
                             <div class="font-semibold">
                                 <label>
                                     <input type="checkbox" class="toggle" name="edit_password" {% if permission[1] == '1' %}checked{% endif %}>
@@ -70,14 +70,14 @@
                         </div>
                     {% else %}
                         <div class="bg-base-200 p-4 rounded-lg">
-                            <div class="text-sm opacity-70 mb-1">Modification des mots de passes : </div>
+                            <div class="text-sm opacity-70 mb-1">Modification des mots de passe : </div>
                             <div class="font-semibold">{% if permission[1] == "1" %} Oui {% else %} Non {% endif %}</div>
                         </div>
                     {% endif %}
 
                     {% if user_permission.allow_edit_email or user_permission.admin %}
                         <div class="bg-base-200 p-4 rounded-lg">
-                            <div class="text-sm opacity-70 mb-1">Modification des addresses emails :</div>
+                            <div class="text-sm opacity-70 mb-1">Modification des adresses e-mail :</div>
                             <div class="font-semibold">
                                 <label>
                                     <input type="checkbox" class="toggle" name="edit_email" {% if permission[2] == '1' %}checked{% endif %}><br>
@@ -86,14 +86,14 @@
                         </div>
                     {% else %}
                         <div class="bg-base-200 p-4 rounded-lg">
-                            <div class="text-sm opacity-70 mb-1">Modification des addresses emails :</div>
+                            <div class="text-sm opacity-70 mb-1">Modification des adresses e-mail :</div>
                             <div class="font-semibold">{% if permission[2] == "1" %} Oui {% else %} Non {% endif %}</div>
                         </div>
                     {% endif %}
 
                     {% if user_permission.allow_edit_profile_picture or user_permission.admin %}
                         <div class="bg-base-200 p-4 rounded-lg">
-                            <div class="text-sm opacity-70 mb-1">Modification des photos de profile :</div>
+                            <div class="text-sm opacity-70 mb-1">Modification des photos de profil :</div>
                             <div class="font-semibold">
                                 <label>
                                     <input type="checkbox" class="toggle" name="edit_profile_picture" {% if permission[3] == '1' %}checked{% endif %}><br>
@@ -102,7 +102,7 @@
                         </div>
                     {% else %}
                         <div class="bg-base-200 p-4 rounded-lg">
-                            <div class="text-sm opacity-70 mb-1">Modification des photos de profile :</div>
+                            <div class="text-sm opacity-70 mb-1">Modification des photos de profil :</div>
                             <div class="font-semibold">{% if permission[4] == "1" %}Oui{% else %}Non{% endif %}</div>
                         </div>
                     {% endif %}

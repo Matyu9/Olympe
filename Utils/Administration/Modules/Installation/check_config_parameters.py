@@ -10,25 +10,25 @@ def check_config_parameters(config_file: dict):
     errors = []
 
     if "name" not in config_file:
-        errors.append("parameter missing: 'name' is not defined")
+        errors.append("Paramètre manquant : 'name' n'est pas défini")
 
     if "url-repo" not in config_file:
-        errors.append("parameter missing: 'url-repo' is not defined")
+        errors.append("Paramètre manquant : 'url-repo' n'est pas défini")
 
     if "guidelines" not in config_file:
-        errors.append("parameter missing: 'guidelines' is not defined")
+        errors.append("Paramètre manquant : 'guidelines' n'est pas défini")
 
     if "beta" not in config_file:
-        errors.append("parameter missing: 'beta' is not defined")
+        errors.append("Paramètre manquant : 'beta' n'est pas défini")
 
     if "configuration" not in config_file:
-        errors.append("parameter missing: 'configuration' is not defined")
+        errors.append("Paramètre manquant : 'configuration' n'est pas défini")
     else:
         if "html-input" not in config_file['configuration']:
-            errors.append("parameter missing: 'html-input' is not defined in 'configuration'")
+            errors.append("Paramètre manquant : 'html-input' n'est pas défini dans 'configuration'")
 
         if "install-script" not in config_file['configuration']:
-            errors.append("parameter missing: 'install-script' is not defined in 'configuration'")
+            errors.append("Paramètre manquant : 'install-script' n'est pas défini dans 'configuration'")
 
     if errors:
         raise ModuleConfigValidationError(errors)

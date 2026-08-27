@@ -22,19 +22,19 @@
                     <div class="font-semibold">{{ smtp_info[1].content }}</div>
                 </div>
                 <div class="bg-base-200 p-4 rounded-lg">
-                    <div class="text-sm opacity-70 mb-1">Email d'envoie :</div>
+                    <div class="text-sm opacity-70 mb-1">Adresse e-mail d'envoi :</div>
                     <div class="font-semibold">{{ smtp_info[2].content }}</div>
                 </div>
                 <div class="bg-base-200 p-4 rounded-lg">
-                    <div class="text-sm opacity-70 mb-1">Mots de passe du serveur SMTP :</div>
+                    <div class="text-sm opacity-70 mb-1">Mot de passe du serveur SMTP :</div>
                     <div class="font-semibold">{{ smtp_info[3].content }}</div>
                 </div>
                 <div class="bg-base-200 p-4 rounded-lg">
-                    <div class="text-sm opacity-70 mb-1">Sujet de mail de vérification :</div>
+                    <div class="text-sm opacity-70 mb-1">Objet du mail de vérification :</div>
                     <div class="font-semibold">{{ smtp_info[4].content }}</div>
                 </div>
                 <div class="bg-base-200 p-4 rounded-lg">
-                    <div class="text-sm opacity-70 mb-1">Contenue du mail de verification :</div>
+                    <div class="text-sm opacity-70 mb-1">Contenu du mail de vérification :</div>
                     <div class="font-semibold">{{ smtp_info[5].content }}</div>
                 </div>
                 {% if user_permission.edit_smtp_config or user_permission.admin %}
@@ -70,7 +70,7 @@
                         </div>
                     </div>
                     <div class="bg-base-200 p-4 rounded-lg">
-                        <div class="text-sm opacity-70 mb-1">Email d'envoie :</div>
+                        <div class="text-sm opacity-70 mb-1">Adresse e-mail d'envoi :</div>
                         <div class="font-semibold">
                             <label>
                                 <input type="text" value="{{ smtp_info[2].content }}" name="{{ smtp_info[2].name }}" class="input">
@@ -78,7 +78,7 @@
                         </div>
                     </div>
                     <div class="bg-base-200 p-4 rounded-lg">
-                        <div class="text-sm opacity-70 mb-1">Mots de passe du serveur SMTP :</div>
+                        <div class="text-sm opacity-70 mb-1">Mot de passe du serveur SMTP :</div>
                         <div class="font-semibold">
                             <label>
                                 <input type="text" value="{{ smtp_info[3].content }}" name="{{ smtp_info[3].name }}" class="input">
@@ -86,7 +86,7 @@
                         </div>
                     </div>
                     <div class="bg-base-200 p-4 rounded-lg">
-                        <div class="text-sm opacity-70 mb-1">Sujet de mail de vérification :</div>
+                        <div class="text-sm opacity-70 mb-1">Objet du mail de vérification :</div>
                         <div class="font-semibold">
                             <label>
                                 <textarea class="textarea textarea-bordered" name="{{ smtp_info[4].name }}">{{ smtp_info[4].content | safe }}</textarea>
@@ -94,7 +94,7 @@
                         </div>
                     </div>
                     <div class="bg-base-200 p-4 rounded-lg">
-                        <div class="text-sm opacity-70 mb-1">Contenue du mail de verification :</div>
+                        <div class="text-sm opacity-70 mb-1">Contenu du mail de vérification :</div>
                         <div class="font-semibold">
                             <label>
                                 <textarea class="textarea textarea-bordered" name="{{ smtp_info[5].name }}">{{ smtp_info[5].content }}</textarea>

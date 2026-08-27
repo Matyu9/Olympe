@@ -39,7 +39,7 @@ def send_verification_email(database):
         return 'error1: Configuration incomplète ou inexistante.'
 
     if subject is None or message is None or subject == "" or message == "" or "{}" not in message:
-        return 'error2: Message prédéfinis incomplet ou inexistant'
+        return 'error2: Message prédéfini incomplet ou inexistant'
 
     mail = MIMEMultipart()
     mail['From'] = conn_email
@@ -80,7 +80,7 @@ def send_test_email(database):
         return 'error1: Configuration incomplète ou inexistante.'
 
     if subject is None or message is None or subject == "" or message == "" or "{}" not in message:
-        return 'error2: Message prédéfinis incomplet ou inexistant'
+        return 'error2: Message prédéfini incomplet ou inexistant'
 
     mail = MIMEMultipart()
     mail['From'] = conn_email

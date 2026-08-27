@@ -58,7 +58,7 @@
                         <img
                             class="w-full h-full rounded-lg object-contain"
                             src="{{ url_for('get_profile_picture', token=selected_user_info.token) }}"
-                            alt="profile_picture"
+                            alt="Photo de profil"
                         />
                     </div>
                 </figure>
@@ -76,8 +76,8 @@
                         <div class="font-semibold">{{ selected_user_info.email }}</div>
                     </div>
                     <div class="bg-base-200 p-4 rounded-lg">
-                        <div class="text-sm opacity-70 mb-1">Authetification à deux facteurs</div>
-                        <div class="font-semibold">{% if not selected_user_info.A2F or selected_user_info.A2F == 0 %} Désactivé {% else %} Activé {% endif %}</div>
+                        <div class="text-sm opacity-70 mb-1">Authentification à deux facteurs</div>
+                        <div class="font-semibold">{% if not selected_user_info.A2F or selected_user_info.A2F == 0 %} Désactivée {% else %} Activée {% endif %}</div>
                     </div>
                     <div class="bg-base-200 p-4 rounded-lg">
                         <div class="text-sm opacity-70 mb-1">Thème</div>
@@ -97,7 +97,7 @@
                                 <img
                                     class="w-full h-full rounded-lg object-contain"
                                     src="{{ url_for('get_profile_picture', token=selected_user_info.token) }}"
-                                    alt="profile_picture"
+                                    alt="Photo de profil"
                                 />
                                 {% if user_permission.edit_profile_picture_admin %}
                                     <input type="file" class="file-input file-input-sm w-full max-w-xs mt-2" name="profile_picture" />
@@ -159,7 +159,7 @@
 
                         <div class="bg-base-200 p-4 rounded-lg">
                             <div class="text-sm opacity-70 mb-1">Authentification à deux facteurs</div>
-                            <div class="font-semibold">{% if not selected_user_info.A2F or selected_user_info.A2F == 0 %} Désactivé {% else %} Activé {% endif %}</div>
+                            <div class="font-semibold">{% if not selected_user_info.A2F or selected_user_info.A2F == 0 %} Désactivée {% else %} Activée {% endif %}</div>
                         </div>
 
                         {% if user_permission.admin %}
@@ -294,11 +294,11 @@
                     <tr>
                         <th scope="col">ID</th>
                         <th scope="col">Nom d'utilisateur</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Profile Picture</th>
+                        <th scope="col">Adresse e-mail</th>
+                        <th scope="col">Photo de profil</th>
                         <th scope="col">A2F</th>
-                        <th scope="col">Desactivated</th>
-                        <th scope="col">Link to profile</th>
+                        <th scope="col">Compte désactivé</th>
+                        <th scope="col">Profil</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -312,9 +312,9 @@
                             <td>{{ element.desactivated }}</td>
                             <td>
                                 {% if element.token == request.cookies.get('token') %}
-                                    <button onclick="window.location.href='{{ url_for('user_space') }}'" class="btn btn-secondary">Voir le profile</button>
+                                    <button onclick="window.location.href='{{ url_for('user_space') }}'" class="btn btn-secondary">Voir le profil</button>
                                 {% else %}
-                                    <button onclick="window.location.href='{{ url_for('show_user', user_token=element.token) }}'" class="btn btn-secondary">Voir le profile</button>
+                                    <button onclick="window.location.href='{{ url_for('show_user', user_token=element.token) }}'" class="btn btn-secondary">Voir le profil</button>
                                 {% endif %}
                             </td>
                         </tr>

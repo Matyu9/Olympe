@@ -32,9 +32,9 @@
                 <tr>
                     <th scope="col">ID</th>
                     <th scope="col">Nom</th>
-                    <th scope="col">Url</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Plus d'info</th>
+                    <th scope="col">URL</th>
+                    <th scope="col">Statut</th>
+                    <th scope="col">Détails</th>
                 </tr>
             </thead>
             <tbody>
@@ -44,7 +44,7 @@
                         <td>{{ element.name }}</td>
                         <td><a href="{{ element.fqdn }}" target="_blank" class="link">{{ element.fqdn }}</a></td>
                         <td>{{ element.status }}</td>
-                        <td><button onclick="window.location.href='{{ url_for('show_modules', module_token=element.token) }}'" class="btn btn-secondary">Plus d'info</button></td>
+                        <td><button onclick="window.location.href='{{ url_for('show_modules', module_token=element.token) }}'" class="btn btn-secondary">Détails</button></td>
                     </tr>
                 {% endfor %}
             </tbody>

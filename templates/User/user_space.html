@@ -17,7 +17,7 @@
                     <img
                         class="w-full h-full rounded-lg object-contain"
                         src="{{ url_for('get_profile_picture') }}"
-                        alt="profile_picture"
+                        alt="Photo de profil"
                     />
                 </div>
             </figure>
@@ -34,17 +34,17 @@
                     <div class="text-sm opacity-70 mb-1">Email</div>
                     <div class="font-semibold">
                         {{user_information.email}}
-                        {% if not user_information.email_verified %}<button onclick="window.location.href='{{ url_for('email_verif') }}'" class="btn btn-primary">Vérifier mon email.</button>{% endif %}
+                        {% if not user_information.email_verified %}<button onclick="window.location.href='{{ url_for('email_verif') }}'" class="btn btn-primary">Vérifier mon adresse e-mail</button>{% endif %}
                     </div>
                 </div>
                 <div class="bg-base-200 p-4 rounded-lg">
-                    <div class="text-sm opacity-70 mb-1">Authetification à deux facteurs</div>
+                    <div class="text-sm opacity-70 mb-1">Authentification à deux facteurs</div>
                     <div class="font-semibold">
                         {% if not user_information.A2F or user_information.A2F == 0 %}
-                            Désactivé
-                            <button onclick="window.location.href='{{ url_for('double2FA_add') }}'" class="btn btn-primary">Ajouter l'A2F.</button>
+                            Désactivée
+                            <button onclick="window.location.href='{{ url_for('double2FA_add') }}'" class="btn btn-primary">Activer l'authentification à deux facteurs</button>
                         {% else %}
-                            Activé
+                            Activée
                         {% endif %}</div>
                 </div>
                 <div class="bg-base-200 p-4 rounded-lg">
@@ -65,7 +65,7 @@
                             <img
                                 class="w-full h-full rounded-lg object-contain"
                                 src="{{ url_for('get_profile_picture') }}"
-                                alt="profile_picture"
+                                alt="Photo de profil"
                             />
                             {% if user_permission.edit_profile_picture %}
                                 <input type="file" class="file-input file-input-sm w-full max-w-xs mt-2" name="profile_picture" />
@@ -131,8 +131,8 @@
                         {% endif %}
                         <hr style="height:.5rem; visibility:hidden;" />
                         <div class="bg-base-200 p-4 rounded-lg">
-                            <div class="text-sm opacity-70 mb-1">Authetification à deux facteurs</div>
-                            <div class="font-semibold">{% if not user_information.A2F or user_information.A2F == 0 %} Désactivé {% else %} Activé {% endif %}</div>
+                            <div class="text-sm opacity-70 mb-1">Authentification à deux facteurs</div>
+                            <div class="font-semibold">{% if not user_information.A2F or user_information.A2F == 0 %} Désactivée {% else %} Activée {% endif %}</div>
                         </div>
                         <hr style="height:.5rem; visibility:hidden;" />
                         {% if (user_permission.edit_theme) or user_permission.admin %}
