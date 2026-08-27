@@ -8,6 +8,8 @@ from werkzeug.utils import secure_filename
 from Utils.Database.user import User
 from Utils.Database.permission import Permission
 from Utils.Database.modules import Module
+from Utils.Database.group import Group
+from Utils.Database.group_member import GroupMember
 
 
 def show_user_cogs(database, upload_path):
@@ -39,13 +41,26 @@ def show_user_cogs(database, upload_path):
                     return redirect(url_for('show_user'))
                 selected_user_permission = database.query(Permission).filter(Permission.user_token == request.args.get('user_token')).first()
 
+                # Groupes : résolution manuelle (pas de jointure ORM dans ce codebase, cf. Permission)
+                member_rows = database.query(GroupMember).filter(GroupMember.user_token == selected_user_data.token).all()
+                selected_user_groups = []
+                for member_row in member_rows:
+                    member_group = database.query(Group).filter(Group.id == member_row.group_id).first()
+                    if member_group:
+                        selected_user_groups.append({"member_id": member_row.id, "group_id": member_group.id, "group_name": member_group.name})
+                # Seuls les groupes dont l'utilisateur n'est pas déjà membre apparaissent dans le sélecteur d'ajout
+                already_member_group_ids = {group["group_id"] for group in selected_user_groups}
+                all_groups = [group for group in database.query(Group).all() if group.id not in already_member_group_ids]
+
                 return render_template('Administration/show_user.html',
                                        multiple_user_info=None,
                                        user_permission=user_permission,
                                        user_data=user_data,
                                        selected_user_info=selected_user_data,
                                        selected_user_permission=selected_user_permission,
-                                       modules_info=modules_info)
+                                       modules_info=modules_info,
+                                       selected_user_groups=selected_user_groups,
+                                       all_groups=all_groups)
 
             else:  # Sinon
                 # On sélectionne toute la base de données

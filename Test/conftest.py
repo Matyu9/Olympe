@@ -18,6 +18,8 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from Utils.Database.user import User
 from Utils.Database.permission import Permission
+from Utils.Database.group import Group
+from Utils.Database.group_member import GroupMember
 
 TEST_USERNAME_PREFIX = "_pytest_"
 TEST_PASSWORD = "Pytest-Test-Password-1!"
@@ -112,6 +114,28 @@ def _cleanup_stale_test_users(db_session):
     for (token,) in stale:
         _delete_user(db_session, token)
     yield
+
+
+@pytest.fixture()
+def make_group(db_session):
+    """Factory de groupe de test : make_group() -> Group.
+    Chaque groupe créé (+ ses membres) est nettoyé à la fin du test."""
+    created_ids = []
+
+    def _make_group():
+        group = Group(name=f"{TEST_USERNAME_PREFIX}group_{uuid4()}")
+        db_session.add(group)
+        db_session.commit()
+
+        created_ids.append(group.id)
+        return group
+
+    yield _make_group
+
+    for group_id in created_ids:
+        db_session.query(GroupMember).filter(GroupMember.group_id == group_id).delete()
+        db_session.query(Group).filter(Group.id == group_id).delete()
+    db_session.commit()
 
 
 @pytest.fixture()

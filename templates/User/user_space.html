@@ -51,6 +51,20 @@
                     <div class="text-sm opacity-70 mb-1">Thème</div>
                     <div class="font-semibold">{{ user_information.theme }}</div>
                 </div>
+                <div class="bg-base-200 p-4 rounded-lg">
+                    <div class="text-sm opacity-70 mb-1">Groupes</div>
+                    <div class="font-semibold">
+                        {% if user_groups %}
+                            <div class="flex flex-wrap gap-2">
+                                {% for group_name in user_groups %}
+                                    <span class="badge badge-outline">{{ group_name }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            Aucun groupe.
+                        {% endif %}
+                    </div>
+                </div>
                 <div class="card-actions justify-end">
                     <button class="btn btn-primary" onclick="showUserForm()">Modifier mes informations</button>
                 </div>

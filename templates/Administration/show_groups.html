@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="{{ user_data.theme }}">
+<head>
+    <meta charset="UTF-8">
+    <title>Cantina - Olympe</title>
+    <link rel="icon" href="{{ url_for('static', filename='SVG/logo.svg') }}" sizes="any" type="image/svg+xml">
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="application/javascript" src="{{ url_for('static', filename='JS/Administration/user_picker.js') }}"></script>
+</head>
+<body>
+    {% include "PlaceHolder/sidebar.html" %}
+    <main class="p-4 md:ml-64 h-auto pt-20 min-h-screen">
+        {% if selected_group_info %}
+            <div id="button-bar" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="w-full">
+                    <button onclick="window.location.href='{{ url_for('show_groups') }}'" class="btn btn-secondary w-full">
+                        Tous les groupes
+                    </button>
+                </div>
+            </div>
+            <div class="card bg-base-100 shadow-xl" id="group-data">
+                <div class="card-body">
+                    <div class="bg-base-200 p-4 rounded-lg">
+                        <div class="text-sm opacity-70 mb-1">Nom</div>
+                        <div class="font-semibold">{{ selected_group_info.name }}</div>
+                    </div>
+                    <div class="bg-base-200 p-4 rounded-lg">
+                        <div class="text-sm opacity-70 mb-1">Description</div>
+                        <div class="font-semibold">{{ selected_group_info.description or '—' }}</div>
+                    </div>
+
+                    <h3 class="font-semibold mt-4 mb-2">Membres</h3>
+                    <ul class="space-y-1" id="group-member-list">
+                        {% for member in selected_group_members %}
+                            <li class="flex items-center justify-between bg-base-200 p-2 rounded-lg">
+                                <span>{{ member.username }}</span>
+                                <button class="btn btn-xs btn-error" onclick="removeGroupMember({{ member.member_id }})">Retirer</button>
+                            </li>
+                        {% else %}
+                            <li class="opacity-60 text-sm">Aucun membre dans ce groupe.</li>
+                        {% endfor %}
+                    </ul>
+                    <div class="flex gap-2 mt-2">
+                        <div class="relative flex-1">
+                            <input type="text" id="add-member-input" placeholder="Rechercher un utilisateur…" class="input input-sm input-bordered w-full" autocomplete="off">
+                            <ul id="add-member-results" class="hidden absolute z-10 top-full mt-1 left-0 w-full max-h-48 overflow-y-auto bg-base-100 border border-base-300 rounded-lg shadow-lg"></ul>
+                        </div>
+                        <button class="btn btn-sm btn-primary" onclick="addGroupMember()">Ajouter</button>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                const GROUP_ID = {{ selected_group_info.id }};
+                setupUserPicker('add-member-input', 'add-member-results', {{ all_usernames | tojson }});
+
+                function addGroupMember() {
+                    const username = document.getElementById('add-member-input').value.trim();
+                    if (!username) return;
+
+                    fetch('{{ url_for("add_group_member") }}', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({group_id: GROUP_ID, username: username})
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                window.location.reload();
+                            } else {
+                                alert(data.error || "Impossible d'ajouter cet utilisateur.");
+                            }
+                        });
+                }
+
+                function removeGroupMember(memberId) {
+                    fetch('{{ url_for("remove_group_member") }}', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({member_id: memberId})
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                window.location.reload();
+                            }
+                        });
+                }
+            </script>
+        {% elif groups_info is not none %}
+            <div id="button-bar" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="w-full">
+                    <button type="button" class="btn btn-warning w-full" onclick="window.location.href='{{ url_for('add_group') }}'">
+                        Ajouter un groupe
+                    </button>
+                </div>
+            </div>
+            <table class="table table-zebra">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Nom</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Détails</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for element in groups_info %}
+                        <tr>
+                            <th scope="row">{{ element.id }}</th>
+                            <td>{{ element.name }}</td>
+                            <td>{{ element.description or '—' }}</td>
+                            <td><button onclick="window.location.href='{{ url_for('show_groups', group_id=element.id) }}'" class="btn btn-secondary">Détails</button></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </main>
+</body>
+</html>

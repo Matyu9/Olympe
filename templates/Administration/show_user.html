@@ -285,6 +285,69 @@
                     {% endfor %}
             </div>
 
+            {% if user_permission.on_off_modules or user_permission.edit_permission or user_permission.admin %}
+                <div class="card bg-base-200 shadow-xl mt-4" id="user-groups">
+                    <div class="card-body p-4">
+                        <h2 class="card-title text-lg mb-2">Groupes</h2>
+                        <ul class="space-y-1" id="user-group-list">
+                            {% for group in selected_user_groups %}
+                                <li class="flex items-center justify-between bg-base-100 p-2 rounded-lg">
+                                    <span>{{ group.group_name }}</span>
+                                    <button class="btn btn-xs btn-error" onclick="removeUserGroup({{ group.member_id }})">Retirer</button>
+                                </li>
+                            {% else %}
+                                <li class="opacity-60 text-sm">Cet utilisateur n'appartient à aucun groupe.</li>
+                            {% endfor %}
+                        </ul>
+                        <div class="flex gap-2 mt-2">
+                            <select id="add-user-group-select" class="select select-sm select-bordered w-full">
+                                {% for group in all_groups %}
+                                    <option value="{{ group.id }}">{{ group.name }}</option>
+                                {% else %}
+                                    <option value="" disabled>Aucun groupe existant</option>
+                                {% endfor %}
+                            </select>
+                            <button class="btn btn-sm btn-primary" onclick="addUserGroup()">Ajouter</button>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    function addUserGroup() {
+                        const groupId = document.getElementById('add-user-group-select').value;
+                        if (!groupId) return;
+
+                        fetch('{{ url_for("add_group_member") }}', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({group_id: parseInt(groupId, 10), username: '{{ selected_user_info.username }}'})
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    window.location.reload();
+                                } else {
+                                    alert(data.error || "Impossible d'ajouter ce groupe.");
+                                }
+                            });
+                    }
+
+                    function removeUserGroup(memberId) {
+                        fetch('{{ url_for("remove_group_member") }}', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({member_id: memberId})
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    window.location.reload();
+                                }
+                            });
+                    }
+                </script>
+            {% endif %}
+
         {% elif multiple_user_info %}
             {% if user_permission.create_user or user_permission.admin %}
                 <button onclick="window.location.href='{{ url_for('add_user') }}'" class="btn btn-primary">Ajouter un utilisateur</button>

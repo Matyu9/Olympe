@@ -9,6 +9,8 @@ from Utils.Database.modules import Module
 from Utils.Database.user import User
 from Utils.Database.permission import Permission
 from Utils.Database.config import Config
+from Utils.Database.group import Group
+from Utils.Database.group_member import GroupMember
 
 
 def user_space_cogs(database, upload_path):
@@ -30,8 +32,17 @@ def user_space_cogs(database, upload_path):
         # On récupère les permissions générales
         general_permission = {config.name: int(config.content)   for config in database.query(Config).filter(Config.name.startswith('edit_')).all()} # in {"edit_username":1, "edit_password":1, "edit_email":1, "edit_profile_picture":1, "edit_a2f":1}
 
+        # Groupes de l'utilisateur, en lecture seule (résolution manuelle, cf. Permission)
+        member_rows = database.query(GroupMember).filter(GroupMember.user_token == user_information.token).all()
+        user_groups = []
+        for member_row in member_rows:
+            member_group = database.query(Group).filter(Group.id == member_row.group_id).first()
+            if member_group:
+                user_groups.append(member_group.name)
+
         return render_template('User/user_space.html', user_information=user_information,
-                               user_permission=user_permission, modules_info=modules_info, general_permission=general_permission)
+                               user_permission=user_permission, modules_info=modules_info, general_permission=general_permission,
+                               user_groups=user_groups)
 
     elif request.method == 'POST':
         try:

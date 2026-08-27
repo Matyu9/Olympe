@@ -12,6 +12,8 @@ from Utils.Database.config import Config
 from Utils.Database.OAuth2AuthorizationCode import OAuth2AuthorizationCode
 from Utils.Database.OAuth2Token import OAuth2Token
 from Utils.Database.module_installation import ModuleInstallation
+from Utils.Database.group import Group
+from Utils.Database.group_member import GroupMember
 
 from Utils.verify_maintenance import verify_maintenance
 from Utils.OAuth.server import init_oauth_server
@@ -38,6 +40,9 @@ from Cogs.Administration.Modules.regenerate_secret import regenerate_secret_cogs
 from Cogs.Administration.Modules.show_install_form import show_install_form_cogs
 from Cogs.Administration.Modules.start_install import start_install_cogs
 from Cogs.Administration.Modules.show_install_progress import show_install_progress_cogs
+from Cogs.Administration.Groups.show_groups import show_groups_cogs
+from Cogs.Administration.Groups.add_group import add_group_cogs
+from Cogs.Administration.Groups.edit_group_members import add_group_member_cogs, remove_group_member_cogs
 
 from Cogs.API.SSO.login_cogs import api_login_cogs
 from Cogs.API.User.user_info_cogs import api_user_info_cogs
@@ -175,6 +180,22 @@ def create_app(config_path=None):
     @app.route('/admin/modules/regenerate_secret/', methods=['POST'])
     def regenerate_secret():
         return regenerate_secret_cogs(get_db(Session_SQL))
+
+    @app.route('/admin/groups/', methods=['GET'])
+    def show_groups():
+        return show_groups_cogs(get_db(Session_SQL))
+
+    @app.route('/admin/groups/add/', methods=['GET', 'POST'])
+    def add_group():
+        return add_group_cogs(get_db(Session_SQL))
+
+    @app.route('/admin/groups/members/add/', methods=['POST'])
+    def add_group_member():
+        return add_group_member_cogs(get_db(Session_SQL))
+
+    @app.route('/admin/groups/members/remove/', methods=['POST'])
+    def remove_group_member():
+        return remove_group_member_cogs(get_db(Session_SQL))
 
     @app.route('/admin/modules/install/', methods=['GET'])
     def show_install_form():

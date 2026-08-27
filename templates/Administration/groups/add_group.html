@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="{{ user_data.theme }}">
+<head>
+    <meta charset="UTF-8">
+    <title>Cantina - Olympe</title>
+    <link rel="icon" href="{{ url_for('static', filename='SVG/logo.svg') }}" sizes="any" type="image/svg+xml">
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    {% include "PlaceHolder/sidebar.html" %}
+    <main class="p-4 md:ml-64 h-auto pt-20 min-h-screen">
+        <form action="#" method="post">
+            <div class="card card-side bg-base-100 shadow-xl" id="group-form">
+                <div class="card-body">
+                    <div style="gap: .5rem !important;">
+                        <div class="bg-base-200 p-4 rounded-lg">
+                            <div class="text-bold opacity-70 mb-1">Nom du groupe</div>
+                            <div class="font-semibold">
+                                <label>
+                                    <input type="text" name="group_name" class="input w-full max-w-xs" required>
+                                </label>
+                            </div>
+                        </div>
+                        <hr style="height:.5rem; visibility:hidden;" />
+                        <div class="bg-base-200 p-4 rounded-lg">
+                            <div class="text-bold opacity-70 mb-1">Description</div>
+                            <div class="font-semibold">
+                                <label>
+                                    <input type="text" name="group_description" class="input w-full max-w-xs">
+                                </label>
+                            </div>
+                        </div>
+                        <hr style="height:.5rem; visibility:hidden;" />
+                        <div class="card-actions justify-end">
+                            <button class="btn btn-primary" type="submit">Ajouter le groupe</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </main>
+</body>
+</html>
