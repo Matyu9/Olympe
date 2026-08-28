@@ -1,21 +1,14 @@
 from pyotp import random_base32, totp
 from flask import request, render_template, redirect, url_for
-from Utils.verify_login import verify_A2F, verify_login
+from Utils.verify_login import verify_A2F, login_required
 
 from Utils.Database.user import User
 from Utils.Database.permission import Permission
-from Utils.Database.modules import Module
 from Utils.Administration.Modules.module_access import visible_modules_for_user
 
 
+@login_required(desactivated_redirect='olympe_fqdn')
 def doubleFA_add_cogs(database):
-    # Verification si l'utilisateur est connecté
-    if not verify_login(database):
-        return redirect(url_for('sso_login', error='0'))
-    elif verify_login(database) == 'desactivated':  # Si l'utilisateur est connecté, mais que son compte est désactivé
-        login_url = database.query(Module.fqdn).filter(Module.name == "olympe").first().fqdn
-        return redirect(login_url+'/sso/login/?error=2')
-
     # On récupère les permissions de l'utilisateur
     user_permission = database.query(Permission).filter(Permission.user_token == request.cookies.get('token')).first()
 

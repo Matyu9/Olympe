@@ -1,11 +1,10 @@
-from Utils.verify_login import verify_login
+from Utils.verify_login import login_required
 from flask import redirect, url_for, request, render_template
 from argon2 import PasswordHasher, exceptions
 from werkzeug.exceptions import BadRequestKeyError
 from werkzeug.utils import secure_filename
 from os import path, remove
 
-from Utils.Database.modules import Module
 from Utils.Database.user import User
 from Utils.Database.permission import Permission
 from Utils.Database.config import Config
@@ -19,14 +18,8 @@ from Utils.Administration.Modules.module_access import visible_modules_for_user
 ALLOWED_PICTURE_EXTENSIONS = ('png', 'jpg', 'jpeg', 'heic')
 
 
+@login_required(desactivated_redirect='olympe_fqdn')
 def user_space_cogs(database, upload_path):
-    # Verification si l'utilisateur est connecté
-    if not verify_login(database):
-        return redirect(url_for('sso_login', error='0'))
-    elif verify_login(database) == 'desactivated':  # Si l'utilisateur est connecté, mais que son compte est désactivé
-        login_url = database.query(Module.fqdn).filter(Module.name == "olympe").first().fqdn
-        return redirect(login_url+'/sso/login/?error=2')
-
     # Récupération des données de l'utilisateur
     user_information = database.query(User).filter(User.token == request.cookies.get('token')).first()
 

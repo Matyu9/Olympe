@@ -1,11 +1,10 @@
 from datetime import datetime
-from Utils.verify_login import verify_login
-from flask import redirect, url_for, request, render_template
+from Utils.verify_login import login_required
+from flask import request, render_template
 
 from sqlalchemy import func
 from Utils.Database.user import User
 from Utils.Database.permission import Permission
-from Utils.Database.modules import Module
 from Utils.Administration.Modules.module_access import visible_modules_for_user
 
 
@@ -18,14 +17,8 @@ def _greeting():
     return "Bonsoir"
 
 
+@login_required(desactivated_redirect='olympe_fqdn')
 def user_home_cogs(database):
-    # Verification si l'utilisateur est connecté
-    if not verify_login(database):
-        return redirect(url_for('sso_login', error='0'))
-    elif verify_login(database) == 'desactivated':  # Si l'utilisateur est connecté, mais que son compte est désactivé
-        login_url = database.query(Module.fqdn).filter(Module.name == "olympe").first().fqdn
-        return redirect(login_url+'/sso/login/?error=2')
-
     # Récupération des données de l'utilisateur
     user_information = database.query(User).filter(User.token == request.cookies.get('token')).first()
 
