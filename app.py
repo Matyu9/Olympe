@@ -239,11 +239,14 @@ def create_app(config_path=None):
 
     @app.route('/sso/login/', methods=['GET', 'POST'])
     def sso_login(error=0):
-        return sso_login_cogs(get_db(Session_SQL), error, config_data['modules'][0]['global_domain'])
+        return sso_login_cogs(
+            get_db(Session_SQL), error, config_data['modules'][0]['global_domain'],
+            debug_mode=config_data['modules'][0]['debug_mode'],
+        )
 
     @app.route('/sso/logout/', methods=['GET'])
     def sso_logout():
-        return sso_logout_cogs()
+        return sso_logout_cogs(config_data['modules'][0]['global_domain'])
 
     """
         Partie OIDC

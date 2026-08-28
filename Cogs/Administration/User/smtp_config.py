@@ -32,8 +32,11 @@ def smtp_config_cogs(database):
             return redirect(url_for('home'))
 
         if request.method == 'POST':
+            # Whitelist stricte : évite qu'un champ de formulaire arbitraire (ex: secret_token,
+            # une clé de chiffrement) puisse écraser une entrée de config sensible.
             for element in request.form:
-                set_config(database, element, request.form[element])
+                if element in SMTP_KEYS:
+                    set_config(database, element, request.form[element])
             database.commit()
 
             return redirect(url_for('smtp_config'))

@@ -3,10 +3,29 @@ import re
 import subprocess
 import time
 
+import pytest
 import requests
 
+from Utils.Administration.Modules.Installation import local_deploy
 from Utils.Database.module_installation import ModuleInstallation
 from Utils.Database.modules import Module
+
+
+def _bash_available():
+    try:
+        local_deploy._find_bash()
+        return True
+    except RuntimeError:
+        return False
+
+
+# Ce flow passe par local_deploy.run_install_script(), qui a besoin d'un interpréteur bash côté
+# serveur (cf. Test/Administration/Modules/Installation/test_local_deploy.py) — dernier recours,
+# on saute sur une machine sans Git for Windows ni WSL installé.
+requires_bash = pytest.mark.skipif(
+    not _bash_available(),
+    reason="aucun interpréteur bash trouvable (installe Git for Windows ou WSL)",
+)
 
 VALID_MANIFEST = {
     "name": "_pytest_ecosystem_module",
@@ -105,6 +124,7 @@ def test_start_install_rejects_when_missing_permission(base_url, make_user, logi
     assert response.headers["Location"] == "/"
 
 
+@requires_bash
 def test_full_local_install_flow_creates_module_and_config_file(base_url, make_user, login_as, db_session, tmp_path):
     repo = _make_git_repo_with_install_script(
         tmp_path / "repo",

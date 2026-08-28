@@ -18,7 +18,7 @@ def _safe_next_url():
     return None
 
 
-def sso_login_cogs(database, error, global_domain):
+def sso_login_cogs(database, error, global_domain, debug_mode=False):
     if request.method == 'POST':  # Si l'utilisateur à remplir le formulaire
         username = request.form['username']  # Sauvegarde du nom d'utilisateur
         password = request.form['password']  # Sauvegarde du mot de passe
@@ -55,9 +55,18 @@ def sso_login_cogs(database, error, global_domain):
                 else:
                     response = make_response(redirect(domain_to_redirect.fqdn, code=302))
 
-                # Création des cookies de vérification d'authentification
-                response.set_cookie('token', row.token, domain='.'+str(global_domain))
-                response.set_cookie('validation', validation_code, domain='.'+str(global_domain))
+                # Création des cookies de vérification d'authentification.
+                # `secure` est désactivé uniquement en debug_mode (dev local en http://) ;
+                # `samesite='Lax'` laisse passer les redirections top-level du flow SSO
+                # inter-domaines tout en bloquant les envois cross-site en arrière-plan.
+                response.set_cookie(
+                    'token', row.token, domain='.' + str(global_domain),
+                    httponly=True, secure=not debug_mode, samesite='Lax',
+                )
+                response.set_cookie(
+                    'validation', validation_code, domain='.' + str(global_domain),
+                    httponly=True, secure=not debug_mode, samesite='Lax',
+                )
                 return response
             else:  # Dans tous les autres cas
                 return redirect(url_for('sso_login', error='1'))
