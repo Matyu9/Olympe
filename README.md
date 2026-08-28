@@ -11,7 +11,9 @@ Il est conçu pour être **léger**, **simple à déployer** et **compréhensibl
 * ✅ **Refonte UI :** Terminée
 * ✅ **Refonte Base de données :** Terminée
 * ✅ **Architecture technique :** Terminée (Python/Flask)
-* 🚧 **SSO (Single Sign On) :** En cours d'implémentation (Cibles : OIDC & SAML)
+* ✅ **SSO — OpenID Connect (OIDC) :** Implémenté (discovery, JWKS, grants `authorization_code` et `refresh_token`, support PKCE)
+* 📋 **SSO — SAML :** Pas encore commencé
+* 🚧 **Installateur de modules :** Déploiement d'un module (local ou via SSH) depuis son manifeste, avec fédération OIDC automatique auprès d'Olympe
 
 > [!WARNING]
 > Bien que la base soit stable, Olympe est en développement actif. L'utilisation en production critique est pour l'instant déconseillée sans audit préalable.
@@ -146,10 +148,11 @@ pytest -v
 
 Olympe se veut simple et accessible. La stack technique est basée sur **Python** et **Flask**.
 Nous cherchons actuellement de l'aide sur :
-* L'implémentation des protocoles **OpenID Connect (OIDC)**.
 * L'implémentation du protocole **SAML**.
+* Le durcissement et les tests de l'installateur de modules (déploiement local/SSH, fédération OIDC).
 
-N'hésitez pas à ouvrir une Issue ou une Pull Request !
+N'hésitez pas à ouvrir une Issue ou une Pull Request ! Voir [CONTRIBUTING.md](CONTRIBUTING.md)
+pour l'architecture du projet, les conventions de code/commit et le détail du process.
 
 ---
 
