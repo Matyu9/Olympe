@@ -120,17 +120,20 @@ def _cleanup_stale_test_users(db_session):
 
 @pytest.fixture()
 def make_module(db_session):
-    """Factory de module de test : make_module(restricted_access=True).
+    """Factory de module de test : make_module(restricted_access=True, client_secret="...").
+    `client_secret`, si fourni, est hashé (comme en prod) pour les tests qui passent par le
+    flow OAuth (/oauth/token) : le module.check_client_secret() attend un hash argon2.
     Chaque module créé (+ ses ModuleAccess éventuels) est nettoyé à la fin du test."""
     created_tokens = []
 
-    def _make_module(restricted_access=False):
+    def _make_module(restricted_access=False, client_secret=None):
         token = f"{TEST_USERNAME_PREFIX}{uuid4()}"
         module = Module(
             token=token,
             name=f"{token}_module",
             fqdn=f"https://{token}.example.invalid",
             restricted_access=restricted_access,
+            client_secret=PasswordHasher().hash(client_secret) if client_secret else None,
         )
         db_session.add(module)
         db_session.commit()

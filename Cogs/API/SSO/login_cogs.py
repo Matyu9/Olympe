@@ -21,31 +21,33 @@ def api_login_cogs(database, error):
 
     validation_code = database.query(Config.content).filter(Config.name == "secret_token").scalar()
 
+    # request.json est un dict Python standard : une clé absente lève KeyError, pas
+    # BadRequestKeyError (qui ne concerne que request.form/request.args).
     try:
         dfa_code = request.json['dfa_code']  # Sauvegarde du code d'A2F si l'utilisateur en a rempli un
-    except BadRequestKeyError:
+    except (BadRequestKeyError, KeyError):
         dfa_code = None
 
-    if row is None:  # Si aucune correspondance, redirect vers la page de login avec le message d'erreur n°1
+    if row is None:  # Si aucune correspondance, on ne tente pas la verification du mot de passe sur None
         status_code = 401
+    else:
+        try:
+            PasswordHasher().verify(row.password, password)  # Verification de la correspondance du MDP
 
-    try:
-        PasswordHasher().verify(row.password, password)  # Verification de la correspondance du MDP
+            if row.A2F and dfa_code is None or row.A2F and not dfa_code:
+                # Si l'A2F est activé, mais qu'aucun code n'est fournis
+                status_code = 418
+            elif not row.A2F or verify_A2F(row.A2F_secret):  # Si l'A2F n'est pas activé ou que le code est correcte
+                credentials_status = True
+                unique_id = row.token
+                secret_id = validation_code
+            else:  # Dans tous les autres cas
+                status_code = 401
 
-        if row.A2F and dfa_code is None or row.A2F and not dfa_code:
-            # Si l'A2F est activé, mais qu'aucun code n'est fournis
-            status_code = 418
-        elif not row.A2F or verify_A2F(row.A2F_secret):  # Si l'A2F n'est pas activé ou que le code est correcte
-            credentials_status = True
-            unique_id = row.token
-            secret_id = validation_code
-        else:  # Dans tous les autres cas
+        except VerifyMismatchError:  # Si le MDP ne correspond pas
             status_code = 401
-
-    except VerifyMismatchError:  # Si le MDP ne correspond pas, redirect vers le login avec le message d'erreur n°1
-        status_code = 401
-    except TypeError:
-        status_code = 401
+        except TypeError:
+            status_code = 401
 
     json_to_send = {
         "status_code": status_code,

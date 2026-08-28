@@ -138,7 +138,7 @@ route, répétitif et volumineux) — voir plus bas.
 
 * **Comptes de test** : chaque test qui a besoin d'un utilisateur crée un compte jetable directement en base (préfixé `_pytest_`, mot de passe fixe défini dans `Test/conftest.py`) et le supprime automatiquement à la fin — même si le test échoue.
 * **Serveur non lancé** : si `python app.py` n'a pas été démarré, `pytest` échoue immédiatement avec un message explicite plutôt qu'un timeout confus.
-* **Échec connu, sans rapport** : `Test/Socket/unit/test_socket.py::test_hearbeat` échoue actuellement car il référence un `Module` (token codé en dur) qui n'existe pas en base — indépendant de la suite HTTP mise en place ci-dessus.
+* **`Test/Socket/unit/test_socket.py`** : seule suite qui ne suit pas le pattern « serveur HTTP externe » — elle instancie sa propre app en mémoire (`socketio.test_client`) et gère elle-même le `Module` de test dont `heartbeat` a besoin.
 * **`Test/AccessControl/`** : vérifie route par route que chaque page admin redirige sans la bonne permission et répond `200`/`success` avec — marqué `access_control` et exclu du run `pytest` par défaut (`addopts` dans `pytest.ini`) pour ne pas noyer le run classique dans des dizaines de tests répétitifs. Lancer explicitement avec `pytest -m access_control` ou `pytest Test/AccessControl`.
 
 ### Ajouter un test

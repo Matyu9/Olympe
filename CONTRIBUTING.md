@@ -91,8 +91,12 @@ chaque compte/module/groupe créé via ces fixtures est automatiquement nettoyé
 * Toute logique testable sans serveur (validation, calculs, helpers dans `Utils/`) devrait avoir
   des tests unitaires directs à côté (voir `Test/Administration/Modules/Installation/` pour des
   exemples), plutôt que de tout faire passer par une requête HTTP.
-* `Test/Socket/unit/test_socket.py::test_hearbeat` échoue actuellement en base neuve (référence un
-  token de module codé en dur) — c'est un échec connu et indépendant de vos changements.
+* `Test/Socket/unit/test_socket.py` ne suit pas le pattern « serveur externe » : il instancie sa
+  propre app en mémoire (`socketio.test_client`) plutôt que de parler HTTP à un `python app.py`
+  déjà lancé.
+* Les tests répétitifs par nature (même garde vérifiée route par route) vont dans
+  `Test/AccessControl/`, marqués `access_control` et exclus du run `pytest` par défaut
+  (`addopts` dans `pytest.ini`) — voir la section Tests du README.
 
 ## 📝 Convention de commit
 
