@@ -67,8 +67,11 @@ def login_required(permission=None, redirect_endpoint='home', desactivated_redir
 
             if login_state == 'desactivated':
                 if desactivated_redirect == 'olympe_fqdn':
-                    login_url = database.query(Module.fqdn).filter(Module.name == "olympe").first().fqdn
-                    return redirect(login_url + '/sso/login/?error=2')
+                    olympe_module = database.query(Module.fqdn).filter(Module.name == "olympe").first()
+                    # Si la ligne "olympe" n'existe pas (ou plus) en base, ne pas planter en 500 :
+                    # retomber sur la redirection par defaut plutot que de crasher sur `.fqdn`.
+                    if olympe_module is not None:
+                        return redirect(olympe_module.fqdn + '/sso/login/?error=2')
                 return redirect(url_for('sso_login', error='2'))
 
             if permission is not None:
