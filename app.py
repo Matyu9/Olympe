@@ -1,3 +1,4 @@
+import sys
 from flask import Flask, g
 from flask_socketio import SocketIO, join_room
 from os import path, getcwd, environ
@@ -49,7 +50,6 @@ from Cogs.Administration.Groups.add_group import add_group_cogs
 from Cogs.Administration.Groups.edit_group_members import add_group_member_cogs, remove_group_member_cogs
 
 from Cogs.API.SSO.login_cogs import api_login_cogs
-from Cogs.API.User.user_info_cogs import api_user_info_cogs
 
 from Cogs.Socket.heart_beat_cogs import heart_beat_cogs
 from Cogs.Socket.ping_server_socket_cogs import ping_server_socket_cogs
@@ -103,6 +103,23 @@ def create_app(config_path=None):
     if config_data["modules"][0]["debug_mode"]:
         # Autorise le protocole OIDC en HTTP pour le développement local uniquement
         environ["AUTHLIB_INSECURE_TRANSPORT"] = "1"
+
+        # Garde-fou : debug_mode désactive la vérification TLS d'OIDC (ligne ci-dessus) et active
+        # le débogueur Flask (exécution de code arbitraire si son endpoint est exposé). C'est
+        # normal en dev local (global_domain sur 127.0.0.1/localhost), mais si ce n'est pas le
+        # cas, ce déploiement est probablement joignable depuis l'extérieur avec ces protections
+        # désactivées — on prévient bruyamment plutôt que de laisser passer silencieusement.
+        global_domain = config_data['modules'][0].get('global_domain', '')
+        domain_host = global_domain.split(':')[0].lower()
+        if domain_host not in ('127.0.0.1', 'localhost'):
+            print('\n'.join([
+                '!' * 78,
+                '! ATTENTION : debug_mode=true avec global_domain="{}" (pas localhost).'.format(global_domain),
+                '! Ce mode desactive la verification TLS d\'OIDC et active le debogueur Flask',
+                '! (execution de code arbitraire si son endpoint est expose sur le reseau).',
+                '! Ne JAMAIS utiliser debug_mode=true en dehors d\'un environnement de dev local.',
+                '!' * 78,
+            ]), file=sys.stderr)
     app.config["OAUTH2_REFRESH_TOKEN_GENERATOR"] = True
     # expires_in du access_token, quel que soit le grant qui l'a émis (le refresh_token, lui, n'expire
     # pas tant qu'il n'est pas révoqué : pas de champ d'expiration dédié dans OAuth2Token pour l'instant)
@@ -295,10 +312,6 @@ def create_app(config_path=None):
     @app.route('/api/sso/login', methods=['POST'])
     def api_sso_login(error=0):
         return api_login_cogs(get_db(Session_SQL), error)
-
-    @app.route('/api/user/info/<token>', methods=['GET'])
-    def api_user_info(error=0):
-        return api_user_info_cogs(get_db(Session_SQL), error)
 
     return app, socketio
 
