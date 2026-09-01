@@ -2,9 +2,9 @@ from Utils.verify_login import login_required
 from flask import redirect, url_for, request, render_template
 
 from Utils.Database.user import User
-from Utils.Database.permission import Permission
 from Utils.Database.config import Config, set_config
 from Utils.Administration.Modules.module_access import visible_modules_for_user
+from Utils.permission_resolution import get_effective_permission_view
 
 SMTP_KEYS = ["SMTP_URL", "SMTP_PORT", "SMTP_EMAIL", "SMTP_PASSWORD",
              "MAIL_VERIFICATION_SUJET", "MAIL_VERIFICATION_CONTENU"]
@@ -24,8 +24,9 @@ def smtp_config_cogs(database):
     # On récupère les modules afin de pouvoir faire une redirection sur la page via la sidebar
     modules_info = visible_modules_for_user(database, user_data)
 
-    # On récupère les permissions de l'utilisateur afin de pouvoir afficher les options qui correspondent
-    user_permission = database.query(Permission).filter(Permission.user_token == request.cookies.get('token')).first()
+    # On récupère les permissions effectives de l'utilisateur (droit personnel éventuellement forcé
+    # par un groupe, cf. Utils/permission_resolution.py)
+    user_permission = get_effective_permission_view(database, request.cookies.get('token'))
 
     if request.method == 'POST':
         # Whitelist stricte : évite qu'un champ de formulaire arbitraire (ex: secret_token,

@@ -22,6 +22,7 @@ from Utils.Database.modules import Module
 from Utils.Database.group import Group
 from Utils.Database.group_member import GroupMember
 from Utils.Database.module_access import ModuleAccess
+from Utils.Database.group_permission_override import GroupPermissionOverride
 
 TEST_USERNAME_PREFIX = "_pytest_"
 TEST_PASSWORD = "Pytest-Test-Password-1!"
@@ -157,8 +158,8 @@ def make_group(db_session):
     Chaque groupe créé (+ ses membres et accès module) est nettoyé à la fin du test."""
     created_ids = []
 
-    def _make_group():
-        group = Group(name=f"{TEST_USERNAME_PREFIX}group_{uuid4()}")
+    def _make_group(priority=0):
+        group = Group(name=f"{TEST_USERNAME_PREFIX}group_{uuid4()}", priority=priority)
         db_session.add(group)
         db_session.commit()
 
@@ -167,9 +168,13 @@ def make_group(db_session):
 
     yield _make_group
 
+    # Repart sur un instantane frais (REPEATABLE READ) : les tests qui passent par le serveur HTTP
+    # (connexion/session distincte) peuvent avoir modifie ces lignes apres le dernier commit local.
+    db_session.rollback()
     for group_id in created_ids:
         db_session.query(GroupMember).filter(GroupMember.group_id == group_id).delete()
         db_session.query(ModuleAccess).filter(ModuleAccess.group_id == group_id).delete()
+        db_session.query(GroupPermissionOverride).filter(GroupPermissionOverride.group_id == group_id).delete()
         db_session.query(Group).filter(Group.id == group_id).delete()
     db_session.commit()
 

@@ -5,17 +5,17 @@ from Utils.verify_login import login_required
 from flask import redirect, url_for, request, render_template
 
 from Utils.Database.user import User
-from Utils.Database.permission import Permission
 from Utils.Database.module_installation import ModuleInstallation
 from Utils.Administration.Modules.Installation.check_config_parameters import check_config_parameters, ModuleConfigValidationError
 from Utils.Administration.Modules.Installation.credentials_crypto import encrypt_json
 from Utils.Administration.Modules.Installation.installer import run_installation
+from Utils.permission_resolution import get_effective_permission_view
 
 
 @login_required(permission='add_modules')
 def start_install_cogs(database, socketio, session_factory):
     user_data = database.query(User).filter(User.token == request.cookies.get('token')).first()
-    user_permission = database.query(Permission).filter(Permission.user_token == request.cookies.get('token')).first()
+    user_permission = get_effective_permission_view(database, request.cookies.get('token'))
 
     if request.method != 'POST':
         return redirect(url_for('admin.show_install_form'))

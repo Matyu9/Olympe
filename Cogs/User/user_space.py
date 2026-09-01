@@ -6,11 +6,11 @@ from werkzeug.utils import secure_filename
 from os import path, remove
 
 from Utils.Database.user import User
-from Utils.Database.permission import Permission
 from Utils.Database.config import Config
 from Utils.Database.group import Group
 from Utils.Database.group_member import GroupMember
 from Utils.Administration.Modules.module_access import visible_modules_for_user
+from Utils.permission_resolution import get_effective_permission_view
 
 # Whitelist stricte des extensions acceptées pour la photo de profil : l'extension du
 # fichier envoyé par le client ne doit jamais être utilisée telle quelle (risque d'upload
@@ -24,8 +24,9 @@ def user_space_cogs(database, upload_path):
     user_information = database.query(User).filter(User.token == request.cookies.get('token')).first()
 
     if request.method == 'GET':
-        # Récupération des permissions de l'utilisateur
-        user_permission = database.query(Permission).filter(Permission.user_token == request.cookies.get('token')).first()
+        # Récupération des permissions effectives de l'utilisateur (droit personnel éventuellement
+        # forcé par un groupe, cf. Utils/permission_resolution.py)
+        user_permission = get_effective_permission_view(database, request.cookies.get('token'))
         # On récupère les modules afin de pouvoir faire une redirection sur la page via la sidebar
         modules_info = visible_modules_for_user(database, user_information)
         # On récupère les permissions générales

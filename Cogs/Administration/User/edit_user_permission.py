@@ -2,6 +2,7 @@ from Utils.verify_login import login_required
 from flask import request, jsonify
 
 from Utils.Database.permission import Permission
+from Utils.permission_resolution import get_effective_permission_view
 
 # Whitelist des colonnes réellement modifiables : empêche d'injecter un nom de colonne
 # arbitraire (ex: une colonne SQLAlchemy interne) via `permission_name`.
@@ -13,8 +14,9 @@ EDITABLE_PERMISSION_NAMES = {
 
 @login_required(permission='edit_permission', redirect_endpoint='admin.show_user')
 def edit_user_permission_cogs(database):
-    # On récupère les permissions de l'utilisateur afin de pouvoir afficher les options qui correspondent
-    user_permission = database.query(Permission).filter(Permission.user_token == request.cookies.get('token')).first()
+    # On récupère les permissions effectives de l'utilisateur (droit personnel éventuellement forcé
+    # par un groupe, cf. Utils/permission_resolution.py)
+    user_permission = get_effective_permission_view(database, request.cookies.get('token'))
 
     permission_name = request.json.get('permission_name')
     if permission_name not in EDITABLE_PERMISSION_NAMES:

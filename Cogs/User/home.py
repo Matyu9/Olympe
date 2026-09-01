@@ -4,8 +4,8 @@ from flask import request, render_template
 
 from sqlalchemy import func
 from Utils.Database.user import User
-from Utils.Database.permission import Permission
 from Utils.Administration.Modules.module_access import visible_modules_for_user
+from Utils.permission_resolution import get_effective_permission_view
 
 
 def _greeting():
@@ -23,8 +23,9 @@ def user_home_cogs(database):
     user_information = database.query(User).filter(User.token == request.cookies.get('token')).first()
 
     if request.method == 'GET':
-        # Récupération des permissions de l'utilisateur
-        user_permission = database.query(Permission).filter(Permission.user_token == request.cookies.get('token')).first()
+        # Récupération des permissions effectives de l'utilisateur (droit personnel éventuellement
+        # forcé par un groupe, cf. Utils/permission_resolution.py)
+        user_permission = get_effective_permission_view(database, request.cookies.get('token'))
         modules_info = visible_modules_for_user(database, user_information)
         nb_user = database.query(func.count(User.id)).scalar()
         nb_module = len(modules_info)

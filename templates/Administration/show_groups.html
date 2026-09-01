@@ -37,6 +37,10 @@
                         <div class="text-sm opacity-70 mb-1">Description</div>
                         <div class="font-semibold">{{ selected_group_info.description or '—' }}</div>
                     </div>
+                    <div class="bg-base-200 p-4 rounded-lg">
+                        <div class="text-sm opacity-70 mb-1">Priorité</div>
+                        <div class="font-semibold">{{ selected_group_info.priority }}</div>
+                    </div>
                     <div class="card-actions justify-end">
                         <button class="btn btn-primary" onclick="showGroupEditForm()">Modifier</button>
                     </div>
@@ -73,6 +77,10 @@
                             <div class="text-sm opacity-70 mb-1">Description</div>
                             <label><input type="text" name="group_description" value="{{ selected_group_info.description or '' }}" class="input input-accent"></label>
                         </div>
+                        <div class="bg-base-200 p-4 rounded-lg">
+                            <div class="text-sm opacity-70 mb-1">Priorité</div>
+                            <label><input type="number" name="group_priority" value="{{ selected_group_info.priority }}" class="input input-accent"></label>
+                        </div>
                         <div class="card-actions justify-end">
                             <button type="button" class="btn btn-secondary" onclick="showGroupEditForm()">Annuler</button>
                             <button class="btn btn-primary">Enregistrer les modifications</button>
@@ -80,6 +88,86 @@
                     </form>
                 </div>
             </div>
+
+            {% if user_permission.edit_permission or user_permission.admin %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                    {% set permissions = [
+                        ('Permissions Utilisateur', [
+                            ('edit_username', 'Modifier son nom d\'utilisateur'),
+                            ('edit_email', 'Modifier son email'),
+                            ('edit_password', 'Modifier son mot de passe'),
+                            ('edit_profile_picture', 'Modifier sa photo de profil'),
+                            ('edit_A2F', 'Modifier sa 2FA'),
+                            ('edit_theme', 'Modifier son thème')
+                        ]),
+                        ('Administration Utilisateurs', [
+                            ('show_specific_account', 'Voir un compte spécifique'),
+                            ('edit_username_admin', 'Modifier nom d\'utilisateur (Admin)'),
+                            ('edit_email_admin', 'Modifier email (Admin)'),
+                            ('edit_password_admin', 'Modifier mot de passe (Admin)'),
+                            ('edit_profile_picture_admin', 'Modifier photo de profil (Admin)')
+                        ]),
+                        ('Gestion des Fonctionnalités', [
+                            ('allow_edit_username', 'Activer modif. nom d\'utilisateur'),
+                            ('allow_edit_email', 'Activer modif. email'),
+                            ('allow_edit_password', 'Activer modif. mot de passe'),
+                            ('allow_edit_profile_picture', 'Activer modif. photo de profil'),
+                            ('allow_edit_A2F', 'Autoriser modif. 2FA')
+                        ]),
+                        ('Gestion des Utilisateurs', [
+                            ('create_user', 'Créer un utilisateur'),
+                            ('delete_account', 'Supprimer un utilisateur'),
+                            ('desactivate_account', 'Désactiver un utilisateur'),
+                            ('edit_permission', 'Modifier les permissions d\'un utilisateur'),
+                        ]),
+                        ('Modules et Maintenance', [
+                            ('show_log', 'Voir les logs'),
+                            ('show_all_modules', 'Voir tous les modules'),
+                            ('on_off_modules', 'Activer/Désactiver modules'),
+                            ('on_off_maintenance', 'Mode maintenance'),
+                            ('delete_modules', 'Supprimer un module'),
+                            ('add_modules', 'Ajouter un module'),
+                            ('edit_name_module', 'Modifier le nom d\'un module'),
+                            ('edit_url_module', 'Modifier l\'URL d\'un module'),
+                            ('edit_socket_url', 'Modifier l\'URL du socket d\'un module')
+                        ]),
+                        ('Configuration Système', [
+                            ('edit_smtp_config', 'Modifier config SMTP')
+                        ])
+                    ] %}
+
+                    {% for category, perms in permissions %}
+                        <div class="card bg-base-200 shadow-xl">
+                            <div class="card-body p-4">
+                                <h2 class="card-title text-lg mb-2">{{ category }}</h2>
+                                <div class="space-y-2">
+                                    {% for perm_code, perm_name in perms %}
+                                        {% set current_value = selected_group_permission_overrides.get(perm_code) %}
+                                        {% set other_overrides = selected_group_other_overrides.get(perm_code) if current_value is not none else none %}
+                                        <div class="flex items-center justify-between p-2 hover:bg-base-300 rounded-lg transition-colors">
+                                            <span class="label-text flex items-center gap-2">
+                                                {{ perm_name }}
+                                                {% if other_overrides %}
+                                                    <span class="badge badge-warning badge-xs"
+                                                          title="Également forcé par : {% for other in other_overrides %}{{ other.group }} ({{ 'Oui' if other.value else 'Non' }}, priorité {{ other.priority }}){% if not loop.last %}, {% endif %}{% endfor %}">
+                                                        Conflit possible
+                                                    </span>
+                                                {% endif %}
+                                            </span>
+                                            <select class="select select-sm select-bordered"
+                                                    onchange="updateGroupPermission('{{ perm_code }}', this.value)">
+                                                <option value="" {% if current_value is none %}selected{% endif %}>Hérité</option>
+                                                <option value="true" {% if current_value == true %}selected{% endif %}>Forcer Oui</option>
+                                                <option value="false" {% if current_value == false %}selected{% endif %}>Forcer Non</option>
+                                            </select>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
 
             <script>
                 const GROUP_ID = {{ selected_group_info.id }};
@@ -128,6 +216,23 @@
                             }
                         });
                 }
+
+                function updateGroupPermission(permissionName, rawValue) {
+                    // "" (Hérité) -> null (supprime l'override), sinon true/false (forçage)
+                    const value = rawValue === '' ? null : rawValue === 'true';
+
+                    fetch('{{ url_for("admin.edit_group_permission") }}', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({group_id: GROUP_ID, permission_name: permissionName, value: value})
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.error) {
+                                alert(data.error);
+                            }
+                        });
+                }
             </script>
         {% elif groups_info is not none %}
             <div id="button-bar" class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -143,6 +248,7 @@
                         <th scope="col">ID</th>
                         <th scope="col">Nom</th>
                         <th scope="col">Description</th>
+                        <th scope="col">Priorité</th>
                         <th scope="col">Détails</th>
                     </tr>
                 </thead>
@@ -152,6 +258,7 @@
                             <th scope="row">{{ element.id }}</th>
                             <td>{{ element.name }}</td>
                             <td>{{ element.description or '—' }}</td>
+                            <td>{{ element.priority }}</td>
                             <td><button onclick="window.location.href='{{ url_for('admin.show_groups', group_id=element.id) }}'" class="btn btn-secondary">Détails</button></td>
                         </tr>
                     {% endfor %}

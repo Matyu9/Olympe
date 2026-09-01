@@ -6,6 +6,7 @@ from Utils.Database.config import get_config, set_config
 from Utils.Database.user import User
 from Utils.Database.permission import Permission
 from Utils.Administration.Modules.module_access import visible_modules_for_user
+from Utils.permission_resolution import get_effective_permission_view
 
 # Clé de réglage (table Config) -> attribut correspondant sur le modèle Permission
 PERMISSION_KEYS = {
@@ -17,11 +18,11 @@ PERMISSION_KEYS = {
 }
 
 
-def _can_edit_global_permissions(user_permission):
+def _can_edit_global_permissions(effective):
     return (
-        user_permission.allow_edit_username or user_permission.allow_edit_email
-        or user_permission.allow_edit_password or user_permission.allow_edit_profile_picture
-        or user_permission.allow_edit_A2F or user_permission.admin
+        effective('allow_edit_username') or effective('allow_edit_email')
+        or effective('allow_edit_password') or effective('allow_edit_profile_picture')
+        or effective('allow_edit_A2F') or effective('admin')
     )
 
 
@@ -33,8 +34,9 @@ def global_permission_cogs(database):
     # On récupère les modules afin de pouvoir faire une redirection sur la page via la sidebar
     modules_info = visible_modules_for_user(database, user_data)
 
-    # On récupère les permissions de l'utilisateur afin de pouvoir afficher les options qui correspondent
-    user_permission = database.query(Permission).filter(Permission.user_token == request.cookies.get('token')).first()
+    # On récupère les permissions effectives de l'utilisateur (droit personnel éventuellement forcé
+    # par un groupe, cf. Utils/permission_resolution.py)
+    user_permission = get_effective_permission_view(database, request.cookies.get('token'))
 
     # Valeurs par défaut à "0" tant qu'aucun admin n'a encore sauvegardé de réglage
     permission = [get_config(database, key) for key in PERMISSION_KEYS]

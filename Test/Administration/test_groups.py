@@ -1,6 +1,7 @@
 from Utils.Database.group import Group
 from Utils.Database.group_member import GroupMember
 from Utils.Database.module_access import ModuleAccess
+from Utils.Database.group_permission_override import GroupPermissionOverride
 
 GROUPS_URL = "/admin/groups/"
 DELETE_GROUP_URL = "/admin/groups/delete/"
@@ -13,7 +14,10 @@ def test_edit_group_updates_name_and_description(base_url, make_user, login_as, 
     session = login_as(actor["username"], actor["password"])
     response = session.post(
         base_url + GROUPS_URL,
-        data={"group_id": group.id, "group_name": "Nouveau nom", "group_description": "Nouvelle description"},
+        data={
+            "group_id": group.id, "group_name": "Nouveau nom", "group_description": "Nouvelle description",
+            "group_priority": 7,
+        },
         allow_redirects=False,
     )
 
@@ -24,6 +28,7 @@ def test_edit_group_updates_name_and_description(base_url, make_user, login_as, 
     updated = db_session.query(Group).filter(Group.id == group.id).first()
     assert updated.name == "Nouveau nom"
     assert updated.description == "Nouvelle description"
+    assert updated.priority == 7
 
 
 def test_delete_group_removes_group_and_cascades_members_and_module_access(
@@ -36,6 +41,7 @@ def test_delete_group_removes_group_and_cascades_members_and_module_access(
 
     db_session.add(GroupMember(group_id=group.id, user_token=member["token"]))
     db_session.add(ModuleAccess(module_id=module.id, group_id=group.id))
+    db_session.add(GroupPermissionOverride(group_id=group.id, permission_name="on_off_modules", value=True))
     db_session.commit()
     group_id = group.id
 
@@ -49,3 +55,4 @@ def test_delete_group_removes_group_and_cascades_members_and_module_access(
     assert db_session.query(Group).filter(Group.id == group_id).first() is None
     assert db_session.query(GroupMember).filter(GroupMember.group_id == group_id).first() is None
     assert db_session.query(ModuleAccess).filter(ModuleAccess.group_id == group_id).first() is None
+    assert db_session.query(GroupPermissionOverride).filter(GroupPermissionOverride.group_id == group_id).first() is None

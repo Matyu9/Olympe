@@ -5,8 +5,8 @@ from Utils.verify_login import login_required
 from flask import redirect, url_for, request, render_template
 
 from Utils.Database.user import User
-from Utils.Database.permission import Permission
 from Utils.Database.modules import Module
+from Utils.permission_resolution import get_effective_permission_view
 
 
 @login_required(permission='add_modules')
@@ -14,8 +14,9 @@ def add_modules_cogs(database):
     # On récupère les données de l'utilisateur afin de pouvoir l'afficher
     user_data = database.query(User).filter(User.token == request.cookies.get('token')).first()
 
-    # On récupère les permissions de l'utilisateur afin de pouvoir afficher les options qui correspondent
-    user_permission = database.query(Permission).filter(Permission.user_token == request.cookies.get('token')).first()
+    # On récupère les permissions effectives de l'utilisateur (droit personnel éventuellement forcé
+    # par un groupe, cf. Utils/permission_resolution.py)
+    user_permission = get_effective_permission_view(database, request.cookies.get('token'))
 
     if request.method == 'GET':
         # return render_template('Administration/disabled_feature.html')

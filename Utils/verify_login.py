@@ -6,8 +6,8 @@ from werkzeug.exceptions import BadRequestKeyError
 
 from Utils.Database.user import User
 from Utils.Database.config import Config
-from Utils.Database.permission import Permission
 from Utils.Database.modules import Module
+from Utils.permission_resolution import get_effective_permission_view
 
 def verify_login(database):
     token = request.cookies.get('token')
@@ -45,9 +45,12 @@ def login_required(permission=None, redirect_endpoint='user.home', desactivated_
         else:
             return redirect(url_for('sso.sso_login'))
 
-    `permission` : nom d'attribut booleen de `Permission` requis (le bypass `admin` s'applique
-    toujours en plus), ou une fonction `user_permission -> bool` pour les permissions combinees
-    (ex: `_can_manage_groups` dans edit_group_members.py). `None` ne verifie que la connexion.
+    `permission` : nom d'attribut booleen de `Permission` requis, resolu via
+    `get_effective_permission` (droit personnel eventuellement force par un override de groupe,
+    cf. Utils/permission_resolution.py ; le bypass `admin` s'applique toujours en plus), ou une
+    fonction `effective -> bool` pour les permissions combinees (`effective(name)` resout un droit
+    au besoin ; ex: `_can_manage_groups` dans edit_group_members.py). `None` ne verifie que la
+    connexion.
     `redirect_endpoint` : endpoint Flask vers lequel rediriger si la permission manque.
     `desactivated_redirect` : 'default' redirige vers sso_login (comportement des pages
     d'administration) ; 'olympe_fqdn' redirige vers le fqdn du module "olympe" en base
@@ -75,12 +78,9 @@ def login_required(permission=None, redirect_endpoint='user.home', desactivated_
                 return redirect(url_for('sso.sso_login', error='2'))
 
             if permission is not None:
-                user_permission = database.query(Permission).filter(
-                    Permission.user_token == request.cookies.get('token')
-                ).first()
-                allowed = permission(user_permission) if callable(permission) else (
-                    getattr(user_permission, permission) or user_permission.admin
-                )
+                user_token = request.cookies.get('token')
+                view = get_effective_permission_view(database, user_token)
+                allowed = permission(lambda name: getattr(view, name)) if callable(permission) else getattr(view, permission)
                 if not allowed:
                     return redirect(url_for(redirect_endpoint))
 

@@ -60,3 +60,10 @@ def test_olympe_admin_bypasses_module_restriction(db_session, make_user, make_mo
     module = make_module(restricted_access=True)
 
     assert user_can_access_module(db_session, user, module) is True
+
+
+def test_show_all_modules_permission_bypasses_module_restriction(db_session, make_user, make_module):
+    user = _get_user(db_session, make_user(show_all_modules=True)["token"])
+    module = make_module(restricted_access=True)
+
+    assert user_can_access_module(db_session, user, module) is True

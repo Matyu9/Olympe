@@ -27,6 +27,69 @@ def test_show_modules_accessible_with_add_modules_permission(base_url, make_user
     assert response.status_code == 200
 
 
+def test_show_modules_hides_restricted_module_without_show_all_modules(base_url, make_user, login_as, make_module):
+    """Regression : `add_modules` ("Ajouter un module") ne doit pas donner la visibilite sur les
+    modules a acces restreint - seul `show_all_modules`/`admin`/un acces explicite le permet
+    (cf. Utils/Administration/Modules/module_access.py)."""
+    user = make_user(add_modules=True)
+    open_module = make_module(restricted_access=False)
+    restricted_module = make_module(restricted_access=True)
+    session = login_as(user["username"], user["password"])
+
+    response = session.get(f"{base_url}/admin/modules/")
+
+    assert response.status_code == 200
+    assert open_module.name in response.text
+    assert restricted_module.name not in response.text
+
+
+def test_show_modules_detail_redirects_for_restricted_module_without_access(base_url, make_user, login_as, make_module):
+    user = make_user(add_modules=True)
+    restricted_module = make_module(restricted_access=True)
+    session = login_as(user["username"], user["password"])
+
+    response = session.get(
+        f"{base_url}/admin/modules/?module_token={restricted_module.token}", allow_redirects=False
+    )
+
+    assert response.status_code == 302
+    assert response.headers["Location"] == "/admin/modules/"
+
+
+def test_show_modules_detail_accessible_for_restricted_module_with_show_all_modules(base_url, make_user, login_as, make_module):
+    user = make_user(add_modules=True, show_all_modules=True)
+    restricted_module = make_module(restricted_access=True)
+    session = login_as(user["username"], user["password"])
+
+    response = session.get(f"{base_url}/admin/modules/?module_token={restricted_module.token}")
+
+    assert response.status_code == 200
+
+
+def test_edit_module_denies_restricted_module_without_access(base_url, make_user, login_as, make_module, db_session):
+    user = make_user(add_modules=True)
+    restricted_module = make_module(restricted_access=True)
+    original_name = restricted_module.name
+    session = login_as(user["username"], user["password"])
+
+    response = session.post(
+        f"{base_url}/admin/modules/",
+        data={
+            "token": restricted_module.token,
+            "module_name": "nom-usurpe",
+            "module_url": restricted_module.fqdn,
+            "socket_url": "/socket/",
+        },
+        allow_redirects=False,
+    )
+
+    assert response.status_code == 302
+    assert response.headers["Location"] == "/admin/modules/"
+
+    db_session.rollback()  # repart sur un instantane frais (REPEATABLE READ), cf. Test/Administration/Modules/test_install_module.py
+    assert db_session.query(Module).filter(Module.token == restricted_module.token).first().name == original_name
+
+
 def test_add_modules_form_redirects_when_missing_permission(base_url, make_user, login_as):
     user = make_user()
     session = login_as(user["username"], user["password"])

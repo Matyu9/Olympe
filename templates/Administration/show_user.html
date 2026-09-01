@@ -266,15 +266,27 @@
                             <h2 class="card-title text-lg mb-2">{{ category }}</h2>
                                 <div class="space-y-2">
                                     {% for perm_code, perm_name in perms %}
-                                        <label class="flex items-center justify-between p-2 hover:bg-base-300 rounded-lg transition-colors cursor-pointer group">
+                                        {% set group_override = selected_user_permission_overrides.get(perm_code) %}
+                                        {% set tooltip = 'Forcé à ' ~ ('Oui' if group_override.value else 'Non') ~ ' par le(s) groupe(s) : ' ~ (group_override.groups | join(', ')) if group_override else none %}
+                                        {% if group_override and group_override.conflict %}
+                                            {% set tooltip = tooltip ~ ' — Conflit avec : ' ~ (group_override.dissenting_groups | join(', ')) ~ ' (valeur opposée, priorité plus basse)' %}
+                                        {% endif %}
+                                        <label class="flex items-center justify-between p-2 hover:bg-base-300 rounded-lg transition-colors cursor-pointer group"
+                                               {% if tooltip %}title="{{ tooltip }}"{% endif %}>
                                             <div class="flex flex-col">
-                                                <span class="label-text">{{ perm_name }}</span>
+                                                <span class="label-text flex items-center gap-2">
+                                                    {{ perm_name }}
+                                                    {% if group_override and group_override.conflict %}
+                                                        <span class="badge badge-warning badge-xs">Conflit</span>
+                                                    {% endif %}
+                                                </span>
                                             </div>
                                             <input
                                                 type="checkbox"
                                                 class="toggle toggle-primary"
+                                                {% if group_override %}disabled{% endif %}
                                                 {% if perm_code == 'admin' and (not user_permission.admin or selected_user_info.token == request.cookies.get('token')) %}disabled{% endif %}
-                                                {% if selected_user_permission[perm_code] %}checked{% endif %}
+                                                {% if group_override %}{% if group_override.value %}checked{% endif %}{% elif selected_user_permission[perm_code] %}checked{% endif %}
                                                 onchange="updatePermission('{{ perm_code }}', this.checked)"
                                             />
                                         </label>

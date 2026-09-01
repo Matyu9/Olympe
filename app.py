@@ -16,6 +16,7 @@ from Utils.Database.module_installation import ModuleInstallation
 from Utils.Database.group import Group
 from Utils.Database.group_member import GroupMember
 from Utils.Database.module_access import ModuleAccess
+from Utils.Database.group_permission_override import GroupPermissionOverride
 
 from Utils.verify_maintenance import verify_maintenance
 from Utils.OAuth.server import init_oauth_server

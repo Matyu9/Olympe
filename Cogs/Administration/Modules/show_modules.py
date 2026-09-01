@@ -3,25 +3,33 @@ from flask import redirect, url_for, request, render_template
 from datetime import datetime
 
 from Utils.Database.user import User
-from Utils.Database.permission import Permission
 from Utils.Database.modules import Module
 from Utils.Database.module_access import ModuleAccess
 from Utils.Database.group import Group
+from Utils.permission_resolution import get_effective_permission_view
+from Utils.Administration.Modules.module_access import visible_modules_for_user, user_can_access_module
 
 
 @login_required(permission='add_modules')
 def show_modules_cogs(database):
-    # Cette page est la console d'administration des modules : elle doit lister TOUS les
-    # modules (y compris restreints) à l'admin, indépendamment de son accès personnel.
-    modules_info = database.query(Module).all()
-
     # On récupère les données de l'utilisateur afin de pouvoir l'afficher
     user_data = database.query(User).filter(User.token == request.cookies.get('token')).first()
 
-    # On récupère les permissions de l'utilisateur afin de pouvoir afficher les options qui correspondent
-    user_permission = database.query(Permission).filter(Permission.user_token == request.cookies.get('token')).first()
+    # 'add_modules' ("Ajouter un module") ne donne pas le droit de voir tous les modules
+    # existants : cette console reste soumise à la même règle de visibilité que
+    # l'accueil/la sidebar (modules non restreints + ceux couverts par show_all_modules/admin/accès
+    # explicite, cf. Utils/Administration/Modules/module_access.py).
+    modules_info = visible_modules_for_user(database, user_data)
+
+    # On récupère les permissions effectives de l'utilisateur (droit personnel éventuellement forcé
+    # par un groupe, cf. Utils/permission_resolution.py)
+    user_permission = get_effective_permission_view(database, request.cookies.get('token'))
 
     if request.method == 'POST':
+        target_module = database.query(Module).filter(Module.token == request.form["token"]).first()
+        if target_module is None or not user_can_access_module(database, user_data, target_module):
+            return redirect(url_for('admin.show_modules'))
+
         database.query(Module).filter(Module.token == request.form["token"]).update(
             {
                 "name": request.form["module_name"],
@@ -36,6 +44,8 @@ def show_modules_cogs(database):
     else:
         if request.args.get('module_token'):
             selected_module_info = database.query(Module).filter(Module.token == request.args.get('module_token')).first()
+            if selected_module_info is None or not user_can_access_module(database, user_data, selected_module_info):
+                return redirect(url_for('admin.show_modules'))
 
 
             time_diff = datetime.now() - datetime.fromtimestamp(selected_module_info.last_heartbeat)

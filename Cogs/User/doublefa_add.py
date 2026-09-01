@@ -3,14 +3,15 @@ from flask import request, render_template, redirect, url_for
 from Utils.verify_login import verify_A2F, login_required
 
 from Utils.Database.user import User
-from Utils.Database.permission import Permission
 from Utils.Administration.Modules.module_access import visible_modules_for_user
+from Utils.permission_resolution import get_effective_permission_view
 
 
 @login_required(desactivated_redirect='olympe_fqdn')
 def doubleFA_add_cogs(database):
-    # On récupère les permissions de l'utilisateur
-    user_permission = database.query(Permission).filter(Permission.user_token == request.cookies.get('token')).first()
+    # On récupère les permissions effectives de l'utilisateur (droit personnel éventuellement
+    # forcé par un groupe, cf. Utils/permission_resolution.py)
+    user_permission = get_effective_permission_view(database, request.cookies.get('token'))
 
     # On récupère les données l'utilisateur afin de pouvoir l'afficher
     user_data = database.query(User).filter(User.token == request.cookies.get('token')).first()

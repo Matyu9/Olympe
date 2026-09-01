@@ -1,19 +1,20 @@
 from Utils.Database.module_access import ModuleAccess
 from Utils.Database.group_member import GroupMember
-from Utils.Database.permission import Permission
 from Utils.Database.modules import Module
+from Utils.permission_resolution import get_effective_permission
 
 
 def user_can_access_module(database, user, module):
     """Un module non restreint reste ouvert à tous (comportement historique).
     Un module restreint n'est accessible qu'aux utilisateurs/groupes explicitement
-    autorisés, sauf pour un admin Olympe qui contourne toujours la restriction
-    (même logique que le pattern `x or admin` utilisé partout ailleurs)."""
+    autorisés, sauf pour un admin Olympe ou un titulaire de `show_all_modules`
+    (droit personnel ou forcé par un groupe, cf. Utils/permission_resolution.py),
+    qui contournent toujours la restriction (même logique que le pattern `x or admin`
+    utilisé partout ailleurs)."""
     if not module.restricted_access:
         return True
 
-    user_permission = database.query(Permission).filter(Permission.user_token == user.token).first()
-    if user_permission is not None and user_permission.admin:
+    if get_effective_permission(database, user.token, "show_all_modules"):
         return True
 
     direct_access = database.query(ModuleAccess).filter(

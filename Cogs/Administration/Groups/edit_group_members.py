@@ -6,9 +6,9 @@ from Utils.Database.group_member import GroupMember
 from Utils.Database.user import User
 
 
-def _can_manage_groups(user_permission):
+def _can_manage_groups(effective):
     # Accessible depuis la page Groupes (on_off_modules) et depuis la fiche utilisateur (edit_permission)
-    return user_permission.on_off_modules or user_permission.edit_permission or user_permission.admin
+    return effective('on_off_modules') or effective('edit_permission') or effective('admin')
 
 
 @login_required(permission=_can_manage_groups)

@@ -2,14 +2,14 @@ from Utils.verify_login import login_required
 from flask import redirect, url_for, request, render_template
 
 from Utils.Database.user import User
-from Utils.Database.permission import Permission
 from Utils.Database.module_installation import ModuleInstallation
+from Utils.permission_resolution import get_effective_permission_view
 
 
 @login_required(permission='add_modules')
 def show_install_progress_cogs(database, installation_id):
     user_data = database.query(User).filter(User.token == request.cookies.get('token')).first()
-    user_permission = database.query(Permission).filter(Permission.user_token == request.cookies.get('token')).first()
+    user_permission = get_effective_permission_view(database, request.cookies.get('token'))
 
     installation = database.query(ModuleInstallation).filter(ModuleInstallation.id == installation_id).first()
     if installation is None:

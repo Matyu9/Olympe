@@ -4,14 +4,14 @@ from flask import request, redirect, url_for, render_template
 
 from Utils.verify_login import login_required
 from Utils.Database.user import User
-from Utils.Database.permission import Permission
 from Utils.Database.modules import Module
+from Utils.permission_resolution import get_effective_permission_view
 
 
 @login_required(permission='admin')  # Action sensible : réservée aux admins
 def regenerate_secret_cogs(database):
     user_data = database.query(User).filter(User.token == request.cookies.get('token')).first()
-    user_permission = database.query(Permission).filter(Permission.user_token == request.cookies.get('token')).first()
+    user_permission = get_effective_permission_view(database, request.cookies.get('token'))
 
     module = database.query(Module).filter(Module.token == request.form["module_token"]).first()
     if module is None:

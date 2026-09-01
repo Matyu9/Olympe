@@ -10,6 +10,7 @@ from Utils.Database.permission import Permission
 from Utils.Database.group import Group
 from Utils.Database.group_member import GroupMember
 from Utils.Administration.Modules.module_access import visible_modules_for_user
+from Utils.permission_resolution import get_group_permission_sources, get_effective_permission_view
 
 # Whitelist stricte des extensions acceptées pour la photo de profil : l'extension du
 # fichier envoyé par le client ne doit jamais être utilisée telle quelle (risque d'upload
@@ -29,8 +30,9 @@ def show_user_cogs(database, upload_path):
         # On récupère les modules afin de pouvoir faire une redirection sur la page via la sidebar
         modules_info = visible_modules_for_user(database, user_data)
 
-        # On récupère les permissions de l'utilisateur afin de pouvoir afficher les options qui correspondent
-        user_permission = database.query(Permission).filter(Permission.user_token == request.cookies.get('token')).first()
+        # On récupère les permissions effectives de l'utilisateur (droit personnel éventuellement
+        # forcé par un groupe, cf. Utils/permission_resolution.py)
+        user_permission = get_effective_permission_view(database, request.cookies.get('token'))
 
         # Si l'utilisateur n'a pas les permissions, redirection vers la page d'accueil
         if not user_permission.show_specific_account and not user_permission.admin:
@@ -59,12 +61,17 @@ def show_user_cogs(database, upload_path):
             already_member_group_ids = {group["group_id"] for group in selected_user_groups}
             all_groups = [group for group in database.query(Group).all() if group.id not in already_member_group_ids]
 
+            # Droits actuellement forcés par un des groupes de cet utilisateur (pour désactiver
+            # le toggle correspondant et indiquer le groupe responsable, cf. show_user.html)
+            selected_user_permission_overrides = get_group_permission_sources(database, selected_user_data.token)
+
             return render_template('Administration/show_user.html',
                                    multiple_user_info=None,
                                    user_permission=user_permission,
                                    user_data=user_data,
                                    selected_user_info=selected_user_data,
                                    selected_user_permission=selected_user_permission,
+                                   selected_user_permission_overrides=selected_user_permission_overrides,
                                    modules_info=modules_info,
                                    selected_user_groups=selected_user_groups,
                                    all_groups=all_groups)

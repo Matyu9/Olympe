@@ -159,3 +159,31 @@ def test_delete_group_accessible_with_on_off_modules_permission(base_url, make_u
     assert response.headers["Location"] == "/admin/groups/"
 
     db_session.rollback()  # repart sur un instantane frais (REPEATABLE READ) avant le nettoyage de make_group, cf. plus haut
+
+
+def test_edit_group_permission_redirects_when_missing_permission(base_url, make_user, login_as, make_group):
+    actor = make_user(on_off_modules=True)  # suffit pour gerer le groupe, pas pour ses permissions
+    group = make_group()
+    session = login_as(actor["username"], actor["password"])
+
+    response = session.post(
+        f"{base_url}/admin/groups/permission/",
+        json={"group_id": group.id, "permission_name": "on_off_modules", "value": True},
+        allow_redirects=False,
+    )
+
+    assert response.status_code == 302
+    assert response.headers["Location"] == "/admin/groups/"
+
+
+def test_edit_group_permission_accessible_with_edit_permission(base_url, make_user, login_as, make_group):
+    actor = make_user(edit_permission=True)
+    group = make_group()
+    session = login_as(actor["username"], actor["password"])
+
+    response = session.post(
+        f"{base_url}/admin/groups/permission/",
+        json={"group_id": group.id, "permission_name": "on_off_modules", "value": True},
+    )
+
+    assert response.status_code == 200

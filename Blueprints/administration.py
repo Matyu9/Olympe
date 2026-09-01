@@ -23,6 +23,7 @@ from Cogs.Administration.Groups.show_groups import show_groups_cogs
 from Cogs.Administration.Groups.add_group import add_group_cogs
 from Cogs.Administration.Groups.delete_group import delete_group_cogs
 from Cogs.Administration.Groups.edit_group_members import add_group_member_cogs, remove_group_member_cogs
+from Cogs.Administration.Groups.edit_group_permission import edit_group_permission_cogs
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -119,6 +120,11 @@ def add_group_member():
 @admin_bp.route('/groups/members/remove/', methods=['POST'])
 def remove_group_member():
     return remove_group_member_cogs(_db())
+
+
+@admin_bp.route('/groups/permission/', methods=['POST'])
+def edit_group_permission():
+    return edit_group_permission_cogs(_db())
 
 
 @admin_bp.route('/modules/install/', methods=['GET'])
