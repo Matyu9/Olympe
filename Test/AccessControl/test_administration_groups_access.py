@@ -116,7 +116,7 @@ def test_edit_group_redirects_when_missing_permission(base_url, make_user, login
     assert response.headers["Location"] == "/"
 
 
-def test_edit_group_accessible_with_on_off_modules_permission(base_url, make_user, login_as, make_group):
+def test_edit_group_accessible_with_on_off_modules_permission(base_url, make_user, login_as, make_group, db_session):
     actor = make_user(on_off_modules=True)
     group = make_group()
     session = login_as(actor["username"], actor["password"])
@@ -129,6 +129,8 @@ def test_edit_group_accessible_with_on_off_modules_permission(base_url, make_use
 
     assert response.status_code == 302
     assert response.headers["Location"] == f"/admin/groups/?group_id={group.id}"
+
+    db_session.rollback()  # repart sur un instantane frais (REPEATABLE READ) avant le nettoyage de make_group, cf. plus haut
 
 
 def test_delete_group_redirects_when_missing_permission(base_url, make_user, login_as, make_group):
@@ -144,7 +146,7 @@ def test_delete_group_redirects_when_missing_permission(base_url, make_user, log
     assert response.headers["Location"] == "/"
 
 
-def test_delete_group_accessible_with_on_off_modules_permission(base_url, make_user, login_as, make_group):
+def test_delete_group_accessible_with_on_off_modules_permission(base_url, make_user, login_as, make_group, db_session):
     actor = make_user(on_off_modules=True)
     group = make_group()
     session = login_as(actor["username"], actor["password"])
@@ -155,3 +157,5 @@ def test_delete_group_accessible_with_on_off_modules_permission(base_url, make_u
 
     assert response.status_code == 302
     assert response.headers["Location"] == "/admin/groups/"
+
+    db_session.rollback()  # repart sur un instantane frais (REPEATABLE READ) avant le nettoyage de make_group, cf. plus haut

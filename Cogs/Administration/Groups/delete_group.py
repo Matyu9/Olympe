@@ -6,7 +6,7 @@ from Utils.Database.group_member import GroupMember
 from Utils.Database.module_access import ModuleAccess
 
 
-@login_required(permission='on_off_modules', redirect_endpoint='admin.show_groups')
+@login_required(permission='on_off_modules')
 def delete_group_cogs(database):
     group_id = request.form['group_id_to_delete']
 

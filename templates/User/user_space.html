@@ -42,7 +42,7 @@
                     <div class="font-semibold">
                         {% if not user_information.A2F or user_information.A2F == 0 %}
                             Désactivée
-                            <button onclick="window.location.href='{{ url_for('double2FA_add') }}'" class="btn btn-primary">Activer l'authentification à deux facteurs</button>
+                            <button onclick="window.location.href='{{ url_for('user.double2FA_add') }}'" class="btn btn-primary">Activer l'authentification à deux facteurs</button>
                         {% else %}
                             Activée
                         {% endif %}</div>
