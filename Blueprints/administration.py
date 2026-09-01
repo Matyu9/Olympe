@@ -96,7 +96,7 @@ def revoke_module_access():
     return revoke_module_access_cogs(_db())
 
 
-@admin_bp.route('/groups/', methods=['GET'])
+@admin_bp.route('/groups/', methods=['GET', 'POST'])
 def show_groups():
     return show_groups_cogs(_db())
 

@@ -16,6 +16,17 @@ def show_groups_cogs(database):
     modules_info = visible_modules_for_user(database, user_data)
     user_permission = database.query(Permission).filter(Permission.user_token == request.cookies.get('token')).first()
 
+    if request.method == 'POST':
+        database.query(Group).filter(Group.id == request.form['group_id']).update(
+            {
+                "name": request.form['group_name'],
+                "description": request.form.get('group_description'),
+            }
+        )
+        database.commit()
+
+        return redirect(url_for('admin.show_groups', group_id=request.form['group_id']))
+
     if request.args.get('group_id'):
         selected_group_info = database.query(Group).filter(Group.id == request.args.get('group_id')).first()
         if selected_group_info is None:

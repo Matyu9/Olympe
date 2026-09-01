@@ -37,6 +37,9 @@
                         <div class="text-sm opacity-70 mb-1">Description</div>
                         <div class="font-semibold">{{ selected_group_info.description or '—' }}</div>
                     </div>
+                    <div class="card-actions justify-end">
+                        <button class="btn btn-primary" onclick="showGroupEditForm()">Modifier</button>
+                    </div>
 
                     <h3 class="font-semibold mt-4 mb-2">Membres</h3>
                     <ul class="space-y-1" id="group-member-list">
@@ -56,6 +59,25 @@
                         </div>
                         <button class="btn btn-sm btn-primary" onclick="addGroupMember()">Ajouter</button>
                     </div>
+                </div>
+            </div>
+            <div class="card bg-base-100 shadow-xl" id="group-form" hidden>
+                <div class="card-body">
+                    <form method="post">
+                        <input type="hidden" name="group_id" value="{{ selected_group_info.id }}">
+                        <div class="bg-base-200 p-4 rounded-lg">
+                            <div class="text-sm opacity-70 mb-1">Nom</div>
+                            <label><input type="text" name="group_name" value="{{ selected_group_info.name }}" class="input input-accent"></label>
+                        </div>
+                        <div class="bg-base-200 p-4 rounded-lg">
+                            <div class="text-sm opacity-70 mb-1">Description</div>
+                            <label><input type="text" name="group_description" value="{{ selected_group_info.description or '' }}" class="input input-accent"></label>
+                        </div>
+                        <div class="card-actions justify-end">
+                            <button type="button" class="btn btn-secondary" onclick="showGroupEditForm()">Annuler</button>
+                            <button class="btn btn-primary">Enregistrer les modifications</button>
+                        </div>
+                    </form>
                 </div>
             </div>
 
@@ -80,6 +102,11 @@
                                 alert(data.error || "Impossible d'ajouter cet utilisateur.");
                             }
                         });
+                }
+
+                function showGroupEditForm() {
+                    document.getElementById('group-data').hidden = !document.getElementById('group-data').hidden;
+                    document.getElementById('group-form').hidden = !document.getElementById('group-form').hidden;
                 }
 
                 function deleteGroup() {
