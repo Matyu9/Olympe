@@ -18,6 +18,14 @@
                         Tous les groupes
                     </button>
                 </div>
+                <div class="w-full">
+                    <form action="{{ url_for('admin.delete_group') }}" method="post" id="delete_group" class="w-full">
+                        <input type="hidden" name="group_id_to_delete" value="{{ selected_group_info.id }}"/>
+                        <button type="button" class="btn btn-warning w-full" onclick="deleteGroup()">
+                            Supprimer le groupe
+                        </button>
+                    </form>
+                </div>
             </div>
             <div class="card bg-base-100 shadow-xl" id="group-data">
                 <div class="card-body">
@@ -72,6 +80,12 @@
                                 alert(data.error || "Impossible d'ajouter cet utilisateur.");
                             }
                         });
+                }
+
+                function deleteGroup() {
+                    if (confirm('Êtes-vous sûr de vouloir supprimer ce groupe ?')) {
+                        document.getElementById('delete_group').submit();
+                    }
                 }
 
                 function removeGroupMember(memberId) {

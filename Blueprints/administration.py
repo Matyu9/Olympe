@@ -21,6 +21,7 @@ from Cogs.Administration.Modules.module_access import (
 )
 from Cogs.Administration.Groups.show_groups import show_groups_cogs
 from Cogs.Administration.Groups.add_group import add_group_cogs
+from Cogs.Administration.Groups.delete_group import delete_group_cogs
 from Cogs.Administration.Groups.edit_group_members import add_group_member_cogs, remove_group_member_cogs
 
 admin_bp = Blueprint('admin', __name__)
@@ -103,6 +104,11 @@ def show_groups():
 @admin_bp.route('/groups/add/', methods=['GET', 'POST'])
 def add_group():
     return add_group_cogs(_db())
+
+
+@admin_bp.route('/groups/delete/', methods=['POST'])
+def delete_group():
+    return delete_group_cogs(_db())
 
 
 @admin_bp.route('/groups/members/add/', methods=['POST'])

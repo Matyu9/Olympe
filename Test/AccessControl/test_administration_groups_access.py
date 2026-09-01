@@ -99,3 +99,29 @@ def test_remove_group_member_redirects_when_missing_permission(base_url, make_us
 
     assert response.status_code == 302
     assert response.headers["Location"] == "/"
+
+
+def test_delete_group_redirects_when_missing_permission(base_url, make_user, login_as, make_group):
+    actor = make_user()  # on_off_modules=False par defaut
+    group = make_group()
+    session = login_as(actor["username"], actor["password"])
+
+    response = session.post(
+        f"{base_url}/admin/groups/delete/", data={"group_id_to_delete": group.id}, allow_redirects=False
+    )
+
+    assert response.status_code == 302
+    assert response.headers["Location"] == "/"
+
+
+def test_delete_group_accessible_with_on_off_modules_permission(base_url, make_user, login_as, make_group):
+    actor = make_user(on_off_modules=True)
+    group = make_group()
+    session = login_as(actor["username"], actor["password"])
+
+    response = session.post(
+        f"{base_url}/admin/groups/delete/", data={"group_id_to_delete": group.id}, allow_redirects=False
+    )
+
+    assert response.status_code == 302
+    assert response.headers["Location"] == "/admin/groups/"
