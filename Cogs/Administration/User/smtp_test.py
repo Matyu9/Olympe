@@ -7,6 +7,6 @@ from flask import redirect, url_for, request
 def smtp_test_cogs(database):
     if request.method == 'POST':
         send_test_email(database)
-        return redirect(url_for('smtp_config'))
+        return redirect(url_for('admin.smtp_config'))
     else:
-        return redirect(url_for('smtp_config'))
+        return redirect(url_for('admin.smtp_config'))

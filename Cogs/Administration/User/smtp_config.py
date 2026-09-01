@@ -35,7 +35,7 @@ def smtp_config_cogs(database):
                 set_config(database, element, request.form[element])
         database.commit()
 
-        return redirect(url_for('smtp_config'))
+        return redirect(url_for('admin.smtp_config'))
     else:
         smtp_info = _get_smtp_info(database)
         return render_template('Administration/smtp_config.html', smtp_info=smtp_info,

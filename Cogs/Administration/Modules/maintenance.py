@@ -28,4 +28,4 @@ def maintenance_cogs(database):
 
         database.commit()
 
-        return redirect(url_for('show_modules', module_token=request.form["module_token"]))
+        return redirect(url_for('admin.show_modules', module_token=request.form["module_token"]))

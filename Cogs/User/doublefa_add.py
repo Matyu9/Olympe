@@ -24,7 +24,7 @@ def doubleFA_add_cogs(database):
                 {"A2F": 1}
             ) # Activation de l'A2F pour l'authentification
             database.commit()
-            return redirect(url_for('user_space'))
+            return redirect(url_for('user.user_space'))
         else:  # Vérification ratée du code
             # Génération du lien avec la chaine de caractère lié à l'utilisateur.
             totp_auth = totp.TOTP(user_data.A2F_secret).provisioning_uri(
@@ -37,7 +37,7 @@ def doubleFA_add_cogs(database):
     elif request.method == 'GET':  # Si l'utilisateur consulte la page du formulaire.
         # Si l'utilisateur à déjà l'A2F d'activé, redirection vers la page d'accueil.
         if user_data.A2F:
-            return redirect(url_for('home'))
+            return redirect(url_for('user.home'))
 
         # Si aucune chaine de caractère n'avait été généré
         if user_data.A2F_secret is None:

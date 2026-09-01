@@ -34,7 +34,7 @@ def sso_login_cogs(database, error, global_domain, debug_mode=False):
         domain_to_redirect = database.query(Module).filter(Module.name == request.args.get('modules')).first()
 
         if row is None:  # Si aucune correspondance, redirect vers la page de login avec le message d'erreur n°1
-            return redirect(url_for('sso_login', error='1'))
+            return redirect(url_for('sso.sso_login', error='1'))
 
         try:
             PasswordHasher().verify(row.password, password)  # Verification de la correspondance du MDP
@@ -47,10 +47,10 @@ def sso_login_cogs(database, error, global_domain, debug_mode=False):
                 if next_url is not None:
                     response = make_response(redirect(next_url, code=302))
                 elif domain_to_redirect is None:
-                    url = url_for('home')
+                    url = url_for('user.home')
                     response = make_response(redirect(url, code=302))
                 elif not user_can_access_module(database, row, domain_to_redirect):
-                    url = url_for('home', module_access_denied='1', module_name=domain_to_redirect.name)
+                    url = url_for('user.home', module_access_denied='1', module_name=domain_to_redirect.name)
                     response = make_response(redirect(url, code=302))
                 else:
                     response = make_response(redirect(domain_to_redirect.fqdn, code=302))
@@ -69,10 +69,10 @@ def sso_login_cogs(database, error, global_domain, debug_mode=False):
                 )
                 return response
             else:  # Dans tous les autres cas
-                return redirect(url_for('sso_login', error='1'))
+                return redirect(url_for('sso.sso_login', error='1'))
 
         except VerifyMismatchError:  # Si le MDP ne correspond pas, redirect vers le login avec le message d'erreur n°1
-            return redirect(url_for('sso_login', error='1'))
+            return redirect(url_for('sso.sso_login', error='1'))
 
     elif request.method == 'GET':  # Si l'utilisateur consulte la page
         # Si l'utilisateur est déjà connecté et que son compte n'est pas désactivé, redirection auto
@@ -84,11 +84,11 @@ def sso_login_cogs(database, error, global_domain, debug_mode=False):
             domain_to_redirect = database.query(Module).filter(Module.name == request.args.get('modules')).first()
 
             if domain_to_redirect is None:
-                return redirect(url_for('home'))
+                return redirect(url_for('user.home'))
             else:
                 current_user = database.query(User).filter(User.token == request.cookies.get('token')).first()
                 if not user_can_access_module(database, current_user, domain_to_redirect):
-                    return redirect(url_for('home', module_access_denied='1', module_name=domain_to_redirect.name))
+                    return redirect(url_for('user.home', module_access_denied='1', module_name=domain_to_redirect.name))
                 return redirect(domain_to_redirect.fqdn, code=302)
 
         print(verify_login(database))

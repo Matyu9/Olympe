@@ -32,7 +32,7 @@ def show_modules_cogs(database):
         )
         database.commit()
 
-        return redirect(url_for('show_modules', module_token=request.form["token"]))
+        return redirect(url_for('admin.show_modules', module_token=request.form["token"]))
     else:
         if request.args.get('module_token'):
             selected_module_info = database.query(Module).filter(Module.token == request.args.get('module_token')).first()

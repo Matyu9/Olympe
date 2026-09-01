@@ -15,7 +15,7 @@ def regenerate_secret_cogs(database):
 
     module = database.query(Module).filter(Module.token == request.form["module_token"]).first()
     if module is None:
-        return redirect(url_for('show_modules'))
+        return redirect(url_for('admin.show_modules'))
 
     plain_secret = token_urlsafe(32)
     module.client_secret = PasswordHasher().hash(plain_secret)

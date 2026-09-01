@@ -20,44 +20,14 @@ from Utils.Database.module_access import ModuleAccess
 from Utils.verify_maintenance import verify_maintenance
 from Utils.OAuth.server import init_oauth_server
 
-from Cogs.SSO.login import sso_login_cogs
-from Cogs.SSO.logout import sso_logout_cogs
-from Cogs.User.home import user_home_cogs
-from Cogs.User.get_profile_picture import get_profile_picture_cogs
-from Cogs.User.user_space import user_space_cogs
-from Cogs.User.doublefa_add import doubleFA_add_cogs
-from Cogs.User.email_verif import email_verif_cogs
-from Cogs.Administration.User.show_user import show_user_cogs
-from Cogs.Administration.User.desactivate_user import desactivate_user_cogs
-from Cogs.Administration.User.delete_user import delete_user_cogs
-from Cogs.Administration.User.add_user import add_user_cogs
-from Cogs.Administration.User.edit_user_permission import edit_user_permission_cogs
-from Cogs.Administration.User.global_permission import global_permission_cogs
-from Cogs.Administration.User.smtp_config import smtp_config_cogs
-from Cogs.Administration.User.smtp_test import smtp_test_cogs
-from Cogs.Administration.Modules.show_modules import show_modules_cogs
-from Cogs.Administration.Modules.add_modules import add_modules_cogs
-from Cogs.Administration.Modules.maintenance import maintenance_cogs
-from Cogs.Administration.Modules.regenerate_secret import regenerate_secret_cogs
-from Cogs.Administration.Modules.show_install_form import show_install_form_cogs
-from Cogs.Administration.Modules.start_install import start_install_cogs
-from Cogs.Administration.Modules.show_install_progress import show_install_progress_cogs
-from Cogs.Administration.Modules.module_access import (
-    toggle_restricted_access_cogs, grant_module_access_cogs, revoke_module_access_cogs
-)
-from Cogs.Administration.Groups.show_groups import show_groups_cogs
-from Cogs.Administration.Groups.add_group import add_group_cogs
-from Cogs.Administration.Groups.edit_group_members import add_group_member_cogs, remove_group_member_cogs
-
-from Cogs.API.SSO.login_cogs import api_login_cogs
+from Blueprints.user import user_bp
+from Blueprints.administration import admin_bp
+from Blueprints.sso import sso_bp
+from Blueprints.oauth import oauth_bp
+from Blueprints.api import api_bp
 
 from Cogs.Socket.heart_beat_cogs import heart_beat_cogs
 from Cogs.Socket.ping_server_socket_cogs import ping_server_socket_cogs
-
-from Cogs.OAuth.authorize_cogs import oauth_authorize_cogs
-from Cogs.OAuth.token_cogs import oauth_token_cogs
-from Cogs.OAuth.userinfo_cogs import oauth_userinfo_cogs
-from Cogs.OAuth.discovery_cogs import oidc_discovery_cogs, oidc_jwks_cogs
 
 
 def create_app(config_path=None):
@@ -92,6 +62,10 @@ def create_app(config_path=None):
     Base.metadata.create_all(engine_sql)
 
     Session_SQL = sessionmaker(bind=engine_sql)
+    # Exposés via app.config pour que les Blueprints y accèdent avec flask.current_app
+    # plutôt que par closure (cf. commentaire CONFIG_DATA ci-dessus)
+    app.config['SESSION_FACTORY'] = Session_SQL
+    app.config['SOCKETIO'] = socketio
 
     # Génération du secret partagé utilisé par les modules Cantina pour valider une session Olympe (cf. cantinaUtils)
     with Session_SQL() as _startup_db:
@@ -138,156 +112,14 @@ def create_app(config_path=None):
         if db is not None:
             db.close()  # Ferme proprement la connexion pour éviter les fuites
 
-    @app.route('/', methods=['GET'])
-    def home():
-        return user_home_cogs(get_db(Session_SQL))
-
-    @app.route('/user_space/get_profile_picture')
-    def get_profile_picture():
-        return get_profile_picture_cogs(app.config['UPLOAD_FOLDER'])
-
-    @app.route('/user_space/', methods=['GET', 'POST'])
-    def user_space():
-        return user_space_cogs(get_db(Session_SQL), app.config['UPLOAD_FOLDER'])
-
-    @app.route('/2FA/add/', methods=['GET', 'POST'])
-    def double2FA_add():
-        return doubleFA_add_cogs(get_db(Session_SQL))
-
-    @app.route('/email/verif/', methods=['GET', 'POST'])
-    def email_verif():
-        return email_verif_cogs(get_db(Session_SQL))
-
-    """
-        Partie administration
-    """
-
-    @app.route('/admin/user/', methods=['GET', 'POST'])
-    def show_user():
-        return show_user_cogs(get_db(Session_SQL), app.config['UPLOAD_FOLDER'])
-
-    @app.route('/admin/user/add/', methods=['GET', 'POST'])
-    def add_user():
-        return add_user_cogs(get_db(Session_SQL))
-
-    @app.route('/admin/user/edit_permission/', methods=['POST'])
-    def edit_permission_user():
-        return edit_user_permission_cogs(get_db(Session_SQL))
-
-    @app.route('/admin/user/desactivate/', methods=['POST'])
-    def desactivate_user():
-        return desactivate_user_cogs(get_db(Session_SQL))
-
-    @app.route('/admin/user/delete/', methods=['POST'])
-    def delete_user():
-        return delete_user_cogs(get_db(Session_SQL))
-
-    @app.route('/admin/permission/global/', methods=['POST', 'GET'])
-    def global_permission():
-        return global_permission_cogs(get_db(Session_SQL))
-
-    @app.route('/admin/modules/', methods=['POST', 'GET'])
-    def show_modules():
-        return show_modules_cogs(get_db(Session_SQL))
-
-    @app.route('/admin/modules/add/', methods=['POST', 'GET'])
-    def add_modules():
-        return add_modules_cogs(get_db(Session_SQL))
-
-    @app.route('/admin/modules/maintenance/', methods=['POST'])
-    def maintenance():
-        return maintenance_cogs(get_db(Session_SQL))
-
-    @app.route('/admin/modules/regenerate_secret/', methods=['POST'])
-    def regenerate_secret():
-        return regenerate_secret_cogs(get_db(Session_SQL))
-
-    @app.route('/admin/modules/access/toggle_restricted/', methods=['POST'])
-    def toggle_restricted_access():
-        return toggle_restricted_access_cogs(get_db(Session_SQL))
-
-    @app.route('/admin/modules/access/grant/', methods=['POST'])
-    def grant_module_access():
-        return grant_module_access_cogs(get_db(Session_SQL))
-
-    @app.route('/admin/modules/access/revoke/', methods=['POST'])
-    def revoke_module_access():
-        return revoke_module_access_cogs(get_db(Session_SQL))
-
-    @app.route('/admin/groups/', methods=['GET'])
-    def show_groups():
-        return show_groups_cogs(get_db(Session_SQL))
-
-    @app.route('/admin/groups/add/', methods=['GET', 'POST'])
-    def add_group():
-        return add_group_cogs(get_db(Session_SQL))
-
-    @app.route('/admin/groups/members/add/', methods=['POST'])
-    def add_group_member():
-        return add_group_member_cogs(get_db(Session_SQL))
-
-    @app.route('/admin/groups/members/remove/', methods=['POST'])
-    def remove_group_member():
-        return remove_group_member_cogs(get_db(Session_SQL))
-
-    @app.route('/admin/modules/install/', methods=['GET'])
-    def show_install_form():
-        return show_install_form_cogs(get_db(Session_SQL))
-
-    @app.route('/admin/modules/install/start/', methods=['POST'])
-    def start_install():
-        return start_install_cogs(get_db(Session_SQL), socketio, Session_SQL)
-
-    @app.route('/admin/modules/install/<int:installation_id>/', methods=['GET'])
-    def show_install_progress(installation_id):
-        return show_install_progress_cogs(get_db(Session_SQL), installation_id)
-
-    @app.route('/admin/smtp/config/', methods=['POST', 'GET'])
-    def smtp_config():
-        return smtp_config_cogs(get_db(Session_SQL))
-
-    @app.route('/admin/smtp/config/test', methods=['POST'])
-    def smtp_test():
-        return smtp_test_cogs(get_db(Session_SQL))
-
-    """
-        Partie Single Sign On
-    """
-
-    @app.route('/sso/login/', methods=['GET', 'POST'])
-    def sso_login(error=0):
-        return sso_login_cogs(
-            get_db(Session_SQL), error, config_data['modules'][0]['global_domain'],
-            debug_mode=config_data['modules'][0]['debug_mode'],
-        )
-
-    @app.route('/sso/logout/', methods=['GET'])
-    def sso_logout():
-        return sso_logout_cogs(config_data['modules'][0]['global_domain'])
-
-    """
-        Partie OIDC
-    """
-
-    @app.route('/oauth/authorize', methods=['GET', 'POST'])
-    def oauth_authorize():
-        return oauth_authorize_cogs(get_db(Session_SQL))
-
-    @app.route('/oauth/token', methods=['POST'])
-    def oauth_token():
-        return oauth_token_cogs()
-
-    @app.route('/oauth/userinfo', methods=['GET', 'POST'])
-    def oauth_userinfo():
-        return oauth_userinfo_cogs(get_db(Session_SQL))
-
-    @app.route('/.well-known/openid-configuration', methods=['GET'])
-    def openid_configuration():
-        return oidc_discovery_cogs()
-
-    @app.route('/oauth/jwks.json', methods=['GET'])
-    def oauth_jwks():
-        return oidc_jwks_cogs(get_db(Session_SQL))
+    # Chaque blueprint regroupe les routes d'un domaine (mirroir de Cogs/<Domaine>/) ;
+    # les vues y accèdent à la DB/socketio/config via flask.current_app.config plutôt
+    # que par closure sur les variables locales de create_app (cf. SESSION_FACTORY ci-dessus).
+    app.register_blueprint(user_bp)
+    app.register_blueprint(admin_bp, url_prefix='/admin')
+    app.register_blueprint(sso_bp, url_prefix='/sso')
+    app.register_blueprint(oauth_bp)
+    app.register_blueprint(api_bp, url_prefix='/api')
 
     """
         Partie Socket
@@ -304,14 +136,6 @@ def create_app(config_path=None):
     @socketio.on('ping_server')
     def ping_server_socket():
         return ping_server_socket_cogs()
-
-    """
-        Partie API
-    """
-
-    @app.route('/api/sso/login', methods=['POST'])
-    def api_sso_login(error=0):
-        return api_login_cogs(get_db(Session_SQL), error)
 
     return app, socketio
 

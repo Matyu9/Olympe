@@ -11,7 +11,7 @@ EDITABLE_PERMISSION_NAMES = {
 }
 
 
-@login_required(permission='edit_permission', redirect_endpoint='show_user')
+@login_required(permission='edit_permission', redirect_endpoint='admin.show_user')
 def edit_user_permission_cogs(database):
     # On récupère les permissions de l'utilisateur afin de pouvoir afficher les options qui correspondent
     user_permission = database.query(Permission).filter(Permission.user_token == request.cookies.get('token')).first()

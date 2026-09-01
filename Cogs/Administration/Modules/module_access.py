@@ -7,7 +7,7 @@ from Utils.Database.group import Group
 from Utils.Database.module_access import ModuleAccess
 
 
-@login_required(permission='on_off_modules', redirect_endpoint='show_modules')
+@login_required(permission='on_off_modules', redirect_endpoint='admin.show_modules')
 def toggle_restricted_access_cogs(database):
     module = database.query(Module).filter(Module.token == request.json['module_token']).first()
     if module is None:
@@ -21,7 +21,7 @@ def toggle_restricted_access_cogs(database):
     return jsonify({"success": True, "restricted_access": not module.restricted_access})
 
 
-@login_required(permission='on_off_modules', redirect_endpoint='show_modules')
+@login_required(permission='on_off_modules', redirect_endpoint='admin.show_modules')
 def grant_module_access_cogs(database):
     module = database.query(Module).filter(Module.token == request.json['module_token']).first()
     if module is None:
@@ -57,7 +57,7 @@ def grant_module_access_cogs(database):
     return jsonify({"success": True})
 
 
-@login_required(permission='on_off_modules', redirect_endpoint='show_modules')
+@login_required(permission='on_off_modules', redirect_endpoint='admin.show_modules')
 def revoke_module_access_cogs(database):
     database.query(ModuleAccess).filter(ModuleAccess.id == request.json['access_id']).delete()
     database.commit()

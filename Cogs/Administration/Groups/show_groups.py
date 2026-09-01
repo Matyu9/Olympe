@@ -19,7 +19,7 @@ def show_groups_cogs(database):
     if request.args.get('group_id'):
         selected_group_info = database.query(Group).filter(Group.id == request.args.get('group_id')).first()
         if selected_group_info is None:
-            return redirect(url_for('show_groups'))
+            return redirect(url_for('admin.show_groups'))
 
         # Résolution manuelle des membres (pas de jointure ORM dans ce codebase, cf. Permission)
         member_rows = database.query(GroupMember).filter(GroupMember.group_id == selected_group_info.id).all()

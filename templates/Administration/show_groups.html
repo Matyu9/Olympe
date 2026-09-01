@@ -14,7 +14,7 @@
         {% if selected_group_info %}
             <div id="button-bar" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="w-full">
-                    <button onclick="window.location.href='{{ url_for('show_groups') }}'" class="btn btn-secondary w-full">
+                    <button onclick="window.location.href='{{ url_for('admin.show_groups') }}'" class="btn btn-secondary w-full">
                         Tous les groupes
                     </button>
                 </div>
@@ -59,7 +59,7 @@
                     const username = document.getElementById('add-member-input').value.trim();
                     if (!username) return;
 
-                    fetch('{{ url_for("add_group_member") }}', {
+                    fetch('{{ url_for("admin.add_group_member") }}', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({group_id: GROUP_ID, username: username})
@@ -75,7 +75,7 @@
                 }
 
                 function removeGroupMember(memberId) {
-                    fetch('{{ url_for("remove_group_member") }}', {
+                    fetch('{{ url_for("admin.remove_group_member") }}', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({member_id: memberId})
@@ -91,7 +91,7 @@
         {% elif groups_info is not none %}
             <div id="button-bar" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="w-full">
-                    <button type="button" class="btn btn-warning w-full" onclick="window.location.href='{{ url_for('add_group') }}'">
+                    <button type="button" class="btn btn-warning w-full" onclick="window.location.href='{{ url_for('admin.add_group') }}'">
                         Ajouter un groupe
                     </button>
                 </div>
@@ -111,7 +111,7 @@
                             <th scope="row">{{ element.id }}</th>
                             <td>{{ element.name }}</td>
                             <td>{{ element.description or '—' }}</td>
-                            <td><button onclick="window.location.href='{{ url_for('show_groups', group_id=element.id) }}'" class="btn btn-secondary">Détails</button></td>
+                            <td><button onclick="window.location.href='{{ url_for('admin.show_groups', group_id=element.id) }}'" class="btn btn-secondary">Détails</button></td>
                         </tr>
                     {% endfor %}
                 </tbody>

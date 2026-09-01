@@ -13,7 +13,7 @@ def show_install_progress_cogs(database, installation_id):
 
     installation = database.query(ModuleInstallation).filter(ModuleInstallation.id == installation_id).first()
     if installation is None:
-        return redirect(url_for('show_modules'))
+        return redirect(url_for('admin.show_modules'))
 
     return render_template('Administration/modules/install_progress.html',
                            installation=installation,

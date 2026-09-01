@@ -10,7 +10,7 @@ def verify_maintenance(database, maintenance):
     exempt_prefixes = ('/static/', '/sso/', '/user_space/get_profile_picture', '/oauth/', '/.well-known/', '/api/')
     if not request.path.startswith(exempt_prefixes):
         if not verify_login(database):
-            return redirect(url_for('sso_login', error='0'))
+            return redirect(url_for('sso.sso_login', error='0'))
         else:
             user_permission = database.query(Permission).filter(Permission.user_token == request.cookies.get('token')).first()
             if maintenance and not user_permission[0]:

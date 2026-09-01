@@ -31,7 +31,7 @@ def email_verif_cogs(database):
                     }
                 )
             database.commit()
-            return redirect(url_for('user_space'))
+            return redirect(url_for('user.user_space'))
         else:  # Sinon redirection vers la page de verification avec une erreur.
             return render_template('User/email-verif.html', error=1, user_permission=user_permission, modules_info=modules_info, user_data=user_data)
 
@@ -44,4 +44,4 @@ def email_verif_cogs(database):
         elif email.startswith("error2"):
             return render_template('User/email-verif.html', error=3, user_permission=user_permission, modules_info=modules_info, user_data=user_data)
         elif email == "already_check":
-            return redirect(url_for("home"))
+            return redirect(url_for("user.home"))

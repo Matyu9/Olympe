@@ -13,12 +13,14 @@ Pour installer les dépendances, configurer `config.json` et lancer le serveur, 
 
 Le code est organisé autour d'un pattern maison, les **Cogs** :
 
-* **`app.py`** ne fait que déclarer les routes Flask et déléguer à un cogs. Une route reste
-  volontairement fine :
+* **`app.py`** assemble l'application et enregistre les blueprints ; il ne déclare aucune route
+  lui-même. **`Blueprints/<domaine>.py`** (un fichier par domaine, calqué sur `Cogs/<Domaine>/`)
+  déclare les routes Flask et délègue à un cogs. Une route reste volontairement fine, et accède à
+  la DB/config via `flask.current_app` plutôt que par closure (voir `Blueprints/administration.py`) :
   ```python
-  @app.route('/admin/user/edit_permission/', methods=['POST'])
+  @admin_bp.route('/user/edit_permission/', methods=['POST'])
   def edit_permission_user():
-      return edit_user_permission_cogs(get_db(Session_SQL))
+      return edit_user_permission_cogs(get_db(current_app.config['SESSION_FACTORY']))
   ```
 * **`Cogs/<Domaine>/<action>_cogs.py`** contient la logique d'une route : la fonction
   `*_cogs()` reçoit la session DB (et parfois d'autres dépendances comme `upload_path`) et
@@ -37,9 +39,9 @@ route protégée :
 if verify_login(database) and verify_login(database) != 'desactivated':
     ...  # logique de la route
 elif verify_login(database) == 'desactivated':
-    return redirect(url_for('sso_login', error='2'))
+    return redirect(url_for('sso.sso_login', error='2'))
 else:
-    return redirect(url_for('sso_login'))
+    return redirect(url_for('sso.sso_login'))
 ```
 
 Notez que le hook global `verify_maintenance` (`app.before_request` dans `app.py`) intercepte déjà

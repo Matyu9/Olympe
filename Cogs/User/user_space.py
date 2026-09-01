@@ -119,7 +119,7 @@ def user_space_cogs(database, upload_path):
                     )
                     database.commit()
 
-        return redirect(url_for('user_space'))
+        return redirect(url_for('user.user_space'))
 
     return None
         

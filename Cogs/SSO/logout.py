@@ -1,7 +1,7 @@
 from flask import make_response, redirect, url_for
 
 def sso_logout_cogs(global_domain):
-    response = make_response(redirect(url_for('sso_login')))
+    response = make_response(redirect(url_for('sso.sso_login')))
 
     # Le `domain=` doit correspondre à celui utilisé au login (Cogs/SSO/login.py) : sans lui,
     # le navigateur crée un cookie vide scopé sur le domaine courant au lieu d'écraser le

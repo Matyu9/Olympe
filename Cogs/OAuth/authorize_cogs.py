@@ -11,9 +11,9 @@ def oauth_authorize_cogs(database):
 
     if not login_status:
         next_url = request.full_path if request.query_string else request.path
-        return redirect(url_for('sso_login', next=next_url))
+        return redirect(url_for('sso.sso_login', next=next_url))
     if login_status == 'desactivated':
-        return redirect(url_for('sso_login', error='2'))
+        return redirect(url_for('sso.sso_login', error='2'))
 
     user = database.query(User).filter(User.token == request.cookies.get('token')).first()
     grant = authorization_server.get_consent_grant(end_user=user)

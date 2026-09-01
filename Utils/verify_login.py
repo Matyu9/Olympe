@@ -36,14 +36,14 @@ def verify_A2F(A2F_secret):
         return key.verify(request.json['dfa_code'].replace(" ", ""))
 
 
-def login_required(permission=None, redirect_endpoint='home', desactivated_redirect='default'):
+def login_required(permission=None, redirect_endpoint='user.home', desactivated_redirect='default'):
     """Factorise le bloc de garde duplique dans la plupart des cogs :
         if verify_login(database) and verify_login(database) != 'desactivated':
             ...
         elif verify_login(database) == 'desactivated':
-            return redirect(url_for('sso_login', error='2'))
+            return redirect(url_for('sso.sso_login', error='2'))
         else:
-            return redirect(url_for('sso_login'))
+            return redirect(url_for('sso.sso_login'))
 
     `permission` : nom d'attribut booleen de `Permission` requis (le bypass `admin` s'applique
     toujours en plus), ou une fonction `user_permission -> bool` pour les permissions combinees
@@ -63,7 +63,7 @@ def login_required(permission=None, redirect_endpoint='home', desactivated_redir
             login_state = verify_login(database)
 
             if not login_state:
-                return redirect(url_for('sso_login', error='0'))
+                return redirect(url_for('sso.sso_login', error='0'))
 
             if login_state == 'desactivated':
                 if desactivated_redirect == 'olympe_fqdn':
@@ -72,7 +72,7 @@ def login_required(permission=None, redirect_endpoint='home', desactivated_redir
                     # retomber sur la redirection par defaut plutot que de crasher sur `.fqdn`.
                     if olympe_module is not None:
                         return redirect(olympe_module.fqdn + '/sso/login/?error=2')
-                return redirect(url_for('sso_login', error='2'))
+                return redirect(url_for('sso.sso_login', error='2'))
 
             if permission is not None:
                 user_permission = database.query(Permission).filter(

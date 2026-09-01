@@ -5,11 +5,11 @@ from Utils.OAuth.keys import get_jwks
 
 def oidc_discovery_cogs():
     return jsonify({
-        "issuer": url_for('home', _external=True).rstrip('/'),
-        "authorization_endpoint": url_for('oauth_authorize', _external=True),
-        "token_endpoint": url_for('oauth_token', _external=True),
-        "userinfo_endpoint": url_for('oauth_userinfo', _external=True),
-        "jwks_uri": url_for('oauth_jwks', _external=True),
+        "issuer": url_for('user.home', _external=True).rstrip('/'),
+        "authorization_endpoint": url_for('oauth.oauth_authorize', _external=True),
+        "token_endpoint": url_for('oauth.oauth_token', _external=True),
+        "userinfo_endpoint": url_for('oauth.oauth_userinfo', _external=True),
+        "jwks_uri": url_for('oauth.oauth_jwks', _external=True),
         "response_types_supported": ["code"],
         "subject_types_supported": ["public"],
         "id_token_signing_alg_values_supported": ["RS256"],

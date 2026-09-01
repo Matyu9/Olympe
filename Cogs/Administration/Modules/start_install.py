@@ -18,7 +18,7 @@ def start_install_cogs(database, socketio, session_factory):
     user_permission = database.query(Permission).filter(Permission.user_token == request.cookies.get('token')).first()
 
     if request.method != 'POST':
-        return redirect(url_for('show_install_form'))
+        return redirect(url_for('admin.show_install_form'))
 
     try:
         config_file = loads(request.form['manifest_json'])
@@ -90,4 +90,4 @@ def start_install_cogs(database, socketio, session_factory):
         run_installation, socketio, installation.id, session_factory, config_file, install_params,
     )
 
-    return redirect(url_for('show_install_progress', installation_id=installation.id))
+    return redirect(url_for('admin.show_install_progress', installation_id=installation.id))

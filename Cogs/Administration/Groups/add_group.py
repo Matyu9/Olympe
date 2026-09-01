@@ -21,4 +21,4 @@ def add_group_cogs(database):
         database.add(group)
         database.commit()
 
-        return redirect(url_for('show_groups', group_id=group.id))
+        return redirect(url_for('admin.show_groups', group_id=group.id))

@@ -17,7 +17,7 @@
             <div id="button-bar" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <!-- Premier bouton -->
                 <div class="w-full">
-                    <button onclick="window.location.href='{{ url_for('show_user') }}'" class="btn btn-primary w-full">
+                    <button onclick="window.location.href='{{ url_for('admin.show_user') }}'" class="btn btn-primary w-full">
                         Tous les utilisateurs
                     </button>
                 </div>
@@ -25,7 +25,7 @@
                 <!-- Deuxième bouton (conditionnel) -->
                 {% if user_permission.delete_account or user_permission.admin %}
                     <div class="w-full">
-                        <form action="{{ url_for('delete_user') }}" method="post" id="delete_account" class="w-full">
+                        <form action="{{ url_for('admin.delete_user') }}" method="post" id="delete_account" class="w-full">
                             <input type='hidden' name='token_to_delete' value="{{ selected_user_info.token }}"/>
                             <button type="button" class="btn btn-warning w-full" onclick="delete_account()">
                                 Supprimer le compte
@@ -37,7 +37,7 @@
                 <!-- Troisième bouton (conditionnel) -->
                 {% if user_permission.desactivate_account or user_permission.admin and selected_user_info.token != request.cookies.get('token') %}
                     <div class="w-full">
-                        <form action="{{ url_for('desactivate_user') }}" method="post" id="desactivate_account" class="w-full">
+                        <form action="{{ url_for('admin.desactivate_user') }}" method="post" id="desactivate_account" class="w-full">
                             <input type='hidden' name='token_to_desactivate' value="{{ selected_user_info.token }}"/>
                             {% if not selected_user_info.desactivated or selected_user_info.desactivated == 0 %}
                                 <button type="button" class="btn btn-warning w-full" onclick="desactivate_account(1)">
@@ -57,7 +57,7 @@
                     <div class="w-48 h-full">
                         <img
                             class="w-full h-full rounded-lg object-contain"
-                            src="{{ url_for('get_profile_picture', token=selected_user_info.token) }}"
+                            src="{{ url_for('user.get_profile_picture', token=selected_user_info.token) }}"
                             alt="Photo de profil"
                         />
                     </div>
@@ -96,7 +96,7 @@
                             <div class="flex flex-col items-center w-48">
                                 <img
                                     class="w-full h-full rounded-lg object-contain"
-                                    src="{{ url_for('get_profile_picture', token=selected_user_info.token) }}"
+                                    src="{{ url_for('user.get_profile_picture', token=selected_user_info.token) }}"
                                     alt="Photo de profil"
                                 />
                                 {% if user_permission.edit_profile_picture_admin %}
@@ -317,7 +317,7 @@
                         const groupId = document.getElementById('add-user-group-select').value;
                         if (!groupId) return;
 
-                        fetch('{{ url_for("add_group_member") }}', {
+                        fetch('{{ url_for("admin.add_group_member") }}', {
                             method: 'POST',
                             headers: {'Content-Type': 'application/json'},
                             body: JSON.stringify({group_id: parseInt(groupId, 10), username: '{{ selected_user_info.username }}'})
@@ -333,7 +333,7 @@
                     }
 
                     function removeUserGroup(memberId) {
-                        fetch('{{ url_for("remove_group_member") }}', {
+                        fetch('{{ url_for("admin.remove_group_member") }}', {
                             method: 'POST',
                             headers: {'Content-Type': 'application/json'},
                             body: JSON.stringify({member_id: memberId})
@@ -350,7 +350,7 @@
 
         {% elif multiple_user_info %}
             {% if user_permission.create_user or user_permission.admin %}
-                <button onclick="window.location.href='{{ url_for('add_user') }}'" class="btn btn-primary">Ajouter un utilisateur</button>
+                <button onclick="window.location.href='{{ url_for('admin.add_user') }}'" class="btn btn-primary">Ajouter un utilisateur</button>
             {% endif %}
             <table class="table table-zebra">
                 <thead>
@@ -375,9 +375,9 @@
                             <td>{{ element.desactivated }}</td>
                             <td>
                                 {% if element.token == request.cookies.get('token') %}
-                                    <button onclick="window.location.href='{{ url_for('user_space') }}'" class="btn btn-secondary">Voir le profil</button>
+                                    <button onclick="window.location.href='{{ url_for('user.user_space') }}'" class="btn btn-secondary">Voir le profil</button>
                                 {% else %}
-                                    <button onclick="window.location.href='{{ url_for('show_user', user_token=element.token) }}'" class="btn btn-secondary">Voir le profil</button>
+                                    <button onclick="window.location.href='{{ url_for('admin.show_user', user_token=element.token) }}'" class="btn btn-secondary">Voir le profil</button>
                                 {% endif %}
                             </td>
                         </tr>
@@ -393,7 +393,7 @@
 function updatePermission(permissionName, value) {
     const userToken = document.getElementById('token').value;
 
-    fetch('{{ url_for('edit_permission_user') }}', {
+    fetch('{{ url_for('admin.edit_permission_user') }}', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

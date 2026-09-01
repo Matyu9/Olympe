@@ -42,7 +42,7 @@
                         <button class="btn btn-primary" onclick="showSMTPEditForm()">Modifier</button>
                     </div>
                 {% endif %}
-                <form method="post" action="{{ url_for('smtp_test') }}">
+                <form method="post" action="{{ url_for('admin.smtp_test') }}">
                     <div class="card-actions justify-end">
                         <button class="btn btn-primary">Envoyer un email de test</button>
                     </div>

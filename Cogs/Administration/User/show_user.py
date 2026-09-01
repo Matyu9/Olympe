@@ -34,18 +34,18 @@ def show_user_cogs(database, upload_path):
 
         # Si l'utilisateur n'a pas les permissions, redirection vers la page d'accueil
         if not user_permission.show_specific_account and not user_permission.admin:
-            return redirect(url_for('home'))
+            return redirect(url_for('user.home'))
 
         # Si l'utilisateur souhaite voir un utilisateur en particulier
         if request.args.get('user_token'):
             # On ne gère pas son propre compte depuis la vue admin : direction l'espace personnel
             if request.args.get('user_token') == request.cookies.get('token'):
-                return redirect(url_for('user_space'))
+                return redirect(url_for('user.user_space'))
 
             # Sélectionne les données et permissions de l'utilisateur souhaité
             selected_user_data = database.query(User).filter(User.token == request.args.get('user_token')).first()
             if selected_user_data is None:  # Le token demandé ne correspond à aucun utilisateur
-                return redirect(url_for('show_user'))
+                return redirect(url_for('admin.show_user'))
             selected_user_permission = database.query(Permission).filter(Permission.user_token == request.args.get('user_token')).first()
 
             # Groupes : résolution manuelle (pas de jointure ORM dans ce codebase, cf. Permission)
@@ -85,7 +85,7 @@ def show_user_cogs(database, upload_path):
         # On sélectionne toutes les infos de l'utilisateur
         selected_user_data = database.query(User).filter(User.token == request.form["token"]).first()
         if selected_user_data is None:  # Le token soumis ne correspond à aucun utilisateur
-            return redirect(url_for('show_user'))
+            return redirect(url_for('admin.show_user'))
         try:
             # On vérifie si l'username a changé
             if request.form['username'] != selected_user_data.username:
@@ -166,7 +166,7 @@ def show_user_cogs(database, upload_path):
                     )
                     database.commit()
 
-        return redirect(url_for('show_user', user_token=request.form['token']))
+        return redirect(url_for('admin.show_user', user_token=request.form['token']))
     # Si l'utilisateur utilise un autre moyen d'acceder à la page, un easter egg apparait
     else:
         return redirect('https://i.pinimg.com/originals/cd/0d/76/cd0d7619041d1f141d3e6fea29bb2724.jpg')

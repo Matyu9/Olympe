@@ -20,6 +20,6 @@ def add_user_cogs(database):
 
     if request.method == 'POST':  # S'il fait une requete de type POST
         _create_user = create_user(database)  # Création de l'utilisateur
-        return redirect(url_for('show_user', user_token=_create_user))
+        return redirect(url_for('admin.show_user', user_token=_create_user))
     elif request.method == 'GET':  # S'il fait une requete de type GET
         return render_template('Administration/add_user.html', modules_info=modules_info, user_data=user_data, user_permission=user_permission)

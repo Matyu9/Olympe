@@ -16,12 +16,12 @@
         <div id="button-bar" class="grid grid-cols-1 md:grid-cols-3 gap-4">
             {% if user_permission.add_modules %}
                 <div class="w-full">
-                    <button type="button" class="btn btn-warning w-full" onclick="window.location.href='{{ url_for('add_modules') }}'">
+                    <button type="button" class="btn btn-warning w-full" onclick="window.location.href='{{ url_for('admin.add_modules') }}'">
                         Ajouter un module
                     </button>
                 </div>
                 <div class="w-full">
-                    <button type="button" class="btn btn-warning w-full" onclick="window.location.href='{{ url_for('show_install_form') }}'">
+                    <button type="button" class="btn btn-warning w-full" onclick="window.location.href='{{ url_for('admin.show_install_form') }}'">
                         Installer un module (JSON)
                     </button>
                 </div>
@@ -44,7 +44,7 @@
                         <td>{{ element.name }}</td>
                         <td><a href="{{ element.fqdn }}" target="_blank" class="link">{{ element.fqdn }}</a></td>
                         <td>{{ element.status }}</td>
-                        <td><button onclick="window.location.href='{{ url_for('show_modules', module_token=element.token) }}'" class="btn btn-secondary">Détails</button></td>
+                        <td><button onclick="window.location.href='{{ url_for('admin.show_modules', module_token=element.token) }}'" class="btn btn-secondary">Détails</button></td>
                     </tr>
                 {% endfor %}
             </tbody>

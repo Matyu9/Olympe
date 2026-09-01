@@ -15,7 +15,7 @@
         <div id="button-bar" class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <!-- Premier bouton -->
             <div class="w-full">
-                <button onclick="window.location.href='{{ url_for('show_modules') }}'" class="btn btn-secondary w-full">
+                <button onclick="window.location.href='{{ url_for('admin.show_modules') }}'" class="btn btn-secondary w-full">
                     Tous les modules
                 </button>
             </div>
@@ -23,7 +23,7 @@
             <!-- Deuxième bouton (conditionnel) -->
             {% if user_permission.on_off_maintenance or user_permission.admin %}
                 <div class="w-full">
-                    <form action="{{ url_for('maintenance') }}" method="post" id="maintenance_mode" class="w-full">
+                    <form action="{{ url_for('admin.maintenance') }}" method="post" id="maintenance_mode" class="w-full">
                         <input type='hidden' name='module_name' value="{{ selected_module_info.name }}"/>
                         <input type='hidden' name='module_token' value="{{ selected_module_info.token }}"/>
                         <button type="button" class="btn btn-error w-full" onclick="maintenance_mode()">
@@ -85,7 +85,7 @@
                 {% endif %}
                 <div class="card-actions justify-end gap-2">
                     {% if user_permission.admin %}
-                        <form action="{{ url_for('regenerate_secret') }}" method="post"
+                        <form action="{{ url_for('admin.regenerate_secret') }}" method="post"
                               onsubmit="return confirm('Régénérer le secret client ? L\'ancien secret cessera de fonctionner immédiatement.');">
                             <input type="hidden" name="module_token" value="{{ selected_module_info.token }}">
                             <button type="submit" class="btn btn-warning">Régénérer le secret client</button>
@@ -241,7 +241,7 @@
         {% endif %}
 
         function toggleRestrictedAccess(checked) {
-            fetch('{{ url_for("toggle_restricted_access") }}', {
+            fetch('{{ url_for("admin.toggle_restricted_access") }}', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({module_token: MODULE_TOKEN})
@@ -264,7 +264,7 @@
                 if (!subjectValue) return;
             }
 
-            fetch('{{ url_for("grant_module_access") }}', {
+            fetch('{{ url_for("admin.grant_module_access") }}', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({module_token: MODULE_TOKEN, subject_type: subjectType, subject_value: subjectValue})
@@ -280,7 +280,7 @@
         }
 
         function revokeModuleAccess(accessId) {
-            fetch('{{ url_for("revoke_module_access") }}', {
+            fetch('{{ url_for("admin.revoke_module_access") }}', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({access_id: accessId})
