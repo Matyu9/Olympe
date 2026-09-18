@@ -158,6 +158,10 @@ Nous cherchons actuellement de l'aide sur :
 N'hésitez pas à ouvrir une Issue ou une Pull Request ! Voir [CONTRIBUTING.md](CONTRIBUTING.md)
 pour l'architecture du projet, les conventions de code/commit et le détail du process.
 
+Vous voulez développer un module externe qui s'authentifie via Olympe ? Voir
+[Docs/module-integration-guide.md](Docs/module-integration-guide.md) pour le protocole de
+fédération OIDC à implémenter.
+
 ---
 
 **Cantina Org**
